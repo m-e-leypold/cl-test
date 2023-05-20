@@ -17,10 +17,18 @@
 # TODO: Copy setup from toplevel make
 
 
-all::   init
+all::
 init::
 clean::
 cleaner::
+setup::
+
+.PHONY: all init clean cleaner setup
+
+
+
+
+# TODO: Set BEN-COMMON
 
 .ONESHELL:
 export PS4 ==> 
