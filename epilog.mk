@@ -13,29 +13,3 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-GIT-SLUG    ?= $(PRODUCT-NAME)
-GIT-ACCOUNT ?= $(USER)
-GIT-REMOTES ?= $(GIT-UPSTREAMS) origin
-
-GIT-ACCOUNT := $(strip $(GIT-ACCOUNT))
-GIT-REMOTES := $(strip $(GIT-REMOTES))
-
-$(info )
-$(info GIT-SLUG    = $(GIT-SLUG))
-$(info GIT-ACCOUNT = $(GIT-ACCOUNT))
-$(info GIT-REMOTES = $(GIT-REMOTES))
-
-GIT-GITLAB.URL = git@gitlab.com:$(GIT-ACCOUNT)/$(GIT-SLUG).git
-GIT-GITHUB.URL = git@github.com:$(GIT-ACCOUNT)/$(GIT-SLUG).git
-GIT-origin.URL = $(shell git remote get-url origin)
-
-.PHONY: git-setup
-
-git-setup: $(patsubst %,git-setup.%,$(filter-out origin,$(GIT-REMOTES)))   # we do not need to setup origin!
-
-git-setup.%:
-	git remote rm $*
-	git remote add $* $(GIT-$*.URL)
-	git fetch $*
-
