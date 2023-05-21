@@ -70,3 +70,6 @@ git-publish-to.origin:
 	git push
 	git push --tags
 	:
+
+publish:: git-publish
+
