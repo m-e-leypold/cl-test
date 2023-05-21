@@ -18,15 +18,12 @@
 
 
 all::
-init::
 clean::
 cleaner::
 setup::
+publish::
 
 .PHONY: all init clean cleaner setup
-
-
-
 
 # TODO: Set BEN-COMMON
 
