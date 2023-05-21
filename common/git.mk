@@ -21,6 +21,11 @@ GIT-REMOTES     ?= $(GIT-UPSTREAMS) origin
 GIT-PUBLIC-USER := $(strip $(GIT-PUBLIC-USER))
 GIT-REMOTES     := $(strip $(GIT-REMOTES))
 
+GIT-MAJOR-VERSIONS   ?= 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+GIT-VERSION-PREFIXES := $(GIT-MAJOR-VERSIONS:%=r%) \
+                        $(GIT-MAJOR-VERSIONS:%=v%) \
+                        $(GIT-MAJOR-VERSIONS)
+
 $(info )
 $(info GIT-SLUG        = $(GIT-SLUG))
 $(info GIT-PUBLIC-USER = $(GIT-PUBLIC-USER))
@@ -42,3 +47,26 @@ git-setup.%:
 
 setup:: git-setup
 
+# .PHONY: $(GIT-REMOTES:%=git-publish-to.%)
+git-pre-publish-check::
+
+git-publish: git-pre-publish-check $(GIT-REMOTES:%=git-publish-to.%)
+
+# TODO: Restrict publishing to specific branches (apart from those
+# that are on remote)
+
+$(patsubst %,git-publish-to.%,$(filter-out origin,$(GIT-REMOTES))): \
+	git-publish-to.%:
+
+	: Pushing to repo $*
+	$(SET-SH)
+	git push "$*"
+	git push "$*" $(GIT-VERSION-PREFIXES:%=refs/tags/%.*)
+	:
+
+git-publish-to.origin:
+	: Pushing to repo origin
+	$(SET-SH)
+	git push
+	git push --tags
+	:
