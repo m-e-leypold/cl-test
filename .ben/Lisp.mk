@@ -17,6 +17,6 @@
 BEN := $(dir $(lastword $(MAKEFILE_LIST)))
 
 include $(BEN)/prolog.mk
-include $(BEN)/common/git.mk
 include $(BEN)/common/project.mk
+include $(BEN)/common/git.mk
 include $(BEN)/epilog.mk
