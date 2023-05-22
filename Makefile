@@ -18,6 +18,4 @@
 #   For altermative licensing options, see README.md
 #
 
-PRODUCT-NAME := cl-test
-
 include .ben/Lisp.mk
