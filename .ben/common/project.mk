@@ -22,5 +22,5 @@ setup:: Project/Project.mk
 Project/Project.mk:
 	git clone --single-branch -b project . Project
 
-
-
+$(info )
+$(info PRODUCT-NAME    = $(PRODUCT-NAME))

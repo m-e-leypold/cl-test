@@ -17,6 +17,16 @@
 BEN := $(dir $(lastword $(MAKEFILE_LIST)))
 
 include $(BEN)/prolog.mk
+
+ASD-FILE := $(wildcard *.asd)
+
+ifeq ($(words $(strip $(ASD-FILE))),1)
+else
+$(error No or more than one .asd file: $(ASD-FILE)) 
+endif
+
+PRODUCT-NAME = $(lastword $(subst ., ,$(ASD-FILE:%.asd=%)))
+
 include $(BEN)/common/project.mk
 include $(BEN)/common/git.mk
 include $(BEN)/epilog.mk
