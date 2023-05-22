@@ -40,10 +40,12 @@ GIT-origin.URL = $(shell git remote get-url origin)
 git-setup: $(patsubst %,git-setup.%,$(filter-out origin,$(GIT-REMOTES)))   # we do not need to setup origin!
 
 git-setup.%:
-	git remote rm $*
+	: Set up remote "$*"
+	$(SET-SH)
+	git remote rm $* || true
 	git remote add $* $(GIT-$*.URL)
 	git fetch $*
-
+	:
 
 setup:: git-setup
 
@@ -58,7 +60,7 @@ git-publish: git-pre-publish-check $(GIT-REMOTES:%=git-publish-to.%)
 $(patsubst %,git-publish-to.%,$(filter-out origin,$(GIT-REMOTES))): \
 	git-publish-to.%:
 
-	: Pushing to repo $*
+	: Push to repo $*
 	$(SET-SH)
 	git push "$*"
 	git push "$*" $(GIT-VERSION-PREFIXES:%=refs/tags/%.*)
