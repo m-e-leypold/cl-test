@@ -26,6 +26,9 @@ GIT-VERSION-PREFIXES := $(GIT-MAJOR-VERSIONS:%=r%) \
                         $(GIT-MAJOR-VERSIONS:%=v%) \
                         $(GIT-MAJOR-VERSIONS)
 
+GIT-PUBLIC-BRANCHES  ?= main
+GIT-CURRENT-BRANCH   := $(shell git branch -q | grep '^[*]' | cut -d' ' -f2)
+
 $(info )
 $(info GIT-SLUG        = $(GIT-SLUG))
 $(info GIT-PUBLIC-USER = $(GIT-PUBLIC-USER))
@@ -50,19 +53,17 @@ git-setup.%:
 setup:: git-setup
 
 # .PHONY: $(GIT-REMOTES:%=git-publish-to.%)
+
 git-pre-publish-check::
 
 git-publish: git-pre-publish-check $(GIT-REMOTES:%=git-publish-to.%)
-
-# TODO: Restrict publishing to specific branches (apart from those
-# that are on remote)
 
 $(patsubst %,git-publish-to.%,$(filter-out origin,$(GIT-REMOTES))): \
 	git-publish-to.%:
 
 	: Push to repo $*
 	$(SET-SH)
-	git push "$*"
+	git push "$*" "$(GIT-CURRENT-BRANCH):$(GIT-CURRENT-BRANCH)"
 	git push "$*" $(GIT-VERSION-PREFIXES:%=refs/tags/%.*)
 	:
 
@@ -75,3 +76,16 @@ git-publish-to.origin:
 
 publish:: git-publish
 
+git-check-publishable-branch:
+	: Check if GIT-CURRENT-BRANCH is among thos that should/can be published.
+	$(SET-SH)
+	set -- $(filter $(GIT-CURRENT-BRANCH),$(GIT-PUBLIC-BRANCHES))
+	test $$# -eq 1
+	:
+
+git-check-worktree-clean:
+	: Check if the worktree is clean, no uncommitted changes
+	$(SET-SH)
+	test "$$(git status -s | wc -l)" -eq 0
+
+git-pre-publish-check:: git-check-publishable-branch git-check-worktree-clean
