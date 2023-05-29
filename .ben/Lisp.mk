@@ -27,12 +27,20 @@ endif
 
 PRODUCT-NAME = $(lastword $(subst ., ,$(ASD-FILE:%.asd=%)))
 
+include $(BEN)/common/project.mk
+
 LISP-IMPLEMENTATION ?= sbcl
 LISP-IMPLEMENTATION := $(strip $(LISP-IMPLEMENTATION))
+
+$(info )
+$(info LISP-IMPLEMENTATION = $(LISP-IMPLEMENTATION))
+$(info ASD-FILE            = $(ASD-FILE))
 
 # * Testing --------------------------------------------------------------------
 
 LISP-TEST-RUNNER ?= $(wildcard test.lisp)
+
+$(info LISP-TEST-RUNNER    = $(LISP-TEST-RUNNER))
 
 ifneq ($(strip $(LISP-TEST-RUNNER)),)
 check::
@@ -49,6 +57,5 @@ LISP-sbcl-RUN-TEST = \
 
 # * More modules from 'common' -------------------------------------------------
 
-include $(BEN)/common/project.mk
 include $(BEN)/common/git.mk
 include $(BEN)/epilog.mk
