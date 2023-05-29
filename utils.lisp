@@ -17,8 +17,13 @@
 ;;;
 ;;;  For alternative licensing options, see README.md
 
-(defpackage :de.m-e-leypold.cl-test/utils
-  (:use :common-lisp))
+
+(in-package :de.m-e-leypold.cl-test/loading-ramp)
+
+;;; * Package definition  --------------------------------------------------------------------------
+
+(define-package :de.m-e-leypold.cl-test/utils
+    "TODO: Utils")
 
 (in-package :de.m-e-leypold.cl-test/utils)
 

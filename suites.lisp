@@ -17,19 +17,22 @@
 ;;;
 ;;;  For alternative licensing options, see README.md
 
-(defpackage :de.m-e-leypold.cl-test/suites
-  (:documentation "
+(in-package :de.m-e-leypold.cl-test/loading-ramp)
 
-   This package serves as a kind of test registry. All symbols interned into this package are
-   global variables, are bound to an instance of
-   `DE.M-E-LEYPOLD.CL-TEST.TEST-SUITES:TEST-SUITE` that refers to a package that is a test
-   suite and the `CL:SYMBOL-NAME` of those symbols are identical to the package names.
+;;; * Package definition  --------------------------------------------------------------------------
 
-   This package is a pure storage container which is filled by other functions in the
-   framework, while the package that contain tests are loaded.
+(define-package :de.m-e-leypold.cl-test/suites
+    
+    "This package serves as a kind of test registry. All symbols interned into this package are
+     global variables, are bound to an instance of
+     `DE.M-E-LEYPOLD.CL-TEST.TEST-SUITES:TEST-SUITE` that refers to a package that is a test
+     suite and the `CL:SYMBOL-NAME` of those symbols are identical to the package names.
 
-   See `DE.M-E-LEYPOLD.CL-TEST.TEST-SUITES:TEST-SUITE`.
-   "))
+     The package is a pure storage container which is filled by other functions in the
+     framework, while the package that contain tests are loaded.
+
+     For more details see `DE.M-E-LEYPOLD.CL-TEST/TEST-SUITES:*DOCUMENTATION*`.
+   ")
 
 (in-package :de.m-e-leypold.cl-test/suites)
 

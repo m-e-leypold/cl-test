@@ -27,12 +27,13 @@
 (in-package :de.m-e-leypold.cl-test/loading-ramp)
 
 (defmacro define-package (name doc-string &body body)
+  "TODO: Doc define-package"
   `(progn
      (defpackage ,name
        (:documentation ,doc-string)
        ,@body
        (:use :common-lisp) 
        (:export :*documentation*))
-     (in-package :de.m-e-leypold.cl-test/assert-based)
+     (in-package ,name)
      (define-package-documentation-anchor "*DOCUMENTATION*")))
 

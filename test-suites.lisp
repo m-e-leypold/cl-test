@@ -17,22 +17,17 @@
 ;;;
 ;;;  For alternative licensing options, see README.md
 
-(defpackage :de.m-e-leypold.cl-test/test-suites
-  
-  (:documentation "
-   This package defines the `TEST-SUITE' abstraction.
+(in-package :de.m-e-leypold.cl-test/loading-ramp)
 
-   TODO: Explain more, refer to other packages.
-   ")
+;;; * Package definition  --------------------------------------------------------------------------
 
-  (:export
-   :*documentation*)
+(define-package :de.m-e-leypold.cl-test/test-suites
   
-  (:use :common-lisp)
-  (:import-from de.m-e-leypold.cl-test/doctools
-   :package-documentation))
+    "This package defines the `TEST-SUITE' abstraction.
+
+     TODO: Explain more, refer to other packages.
+    ")
 
 (in-package :de.m-e-leypold.cl-test/test-suites)
 
-(package-documentation *documentation*)
 

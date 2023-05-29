@@ -17,5 +17,11 @@
 ;;;
 ;;;  For alternative licensing options, see README.md
 
-(defpackage :de.m-e-leypold.cl-test/tests)
+(in-package :de.m-e-leypold.cl-test/loading-ramp)
+
+;;; * Package definition  --------------------------------------------------------------------------
+
+(define-package :de.m-e-leypold.cl-test/tests
+    "TODO: Tests"
+  )
 (in-package :de.m-e-leypold.cl-test/tests)

@@ -88,7 +88,8 @@
   :depends-on ("de.m-e-leypold.cl-test"
 	       "de.m-e-leypold.cl-test/assert-based"
 	       "de.m-e-leypold.cl-test/tests"
-	       "de.m-e-leypold.cl-test/examples"))
+	       "de.m-e-leypold.cl-test/examples"
+	       ))
 
 (defsystem "de.m-e-leypold.cl-test/prerequisites"
   :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"

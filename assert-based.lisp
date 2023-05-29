@@ -22,8 +22,7 @@
 ;;; * Package definition  --------------------------------------------------------------------------
 
 (define-package :de.m-e-leypold.cl-test/assert-based
-  "TODO assert-based
-  "
+    "TODO assert-based"  
   (:export :define-test*))
 
 (in-package :de.m-e-leypold.cl-test/assert-based)

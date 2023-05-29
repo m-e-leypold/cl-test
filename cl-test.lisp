@@ -17,19 +17,12 @@
 ;;;
 ;;;  For alternative licensing options, see README.md
 
-(defpackage :de.m-e-leypold.cl-test
-  (:documentation "
-   TODO cl-test
-   ")
+(in-package :de.m-e-leypold.cl-test/loading-ramp)
 
-  (:use :common-lisp)
-  
-  (:export
-   :*documentation*)
-  
-  (:import-from de.m-e-leypold.cl-test/doctools
-   :package-documentation))
-   
+;;; * Package definition  --------------------------------------------------------------------------
+
+(define-package :de.m-e-leypold.cl-test
+    "TODO cl-test")
+
 (in-package :de.m-e-leypold.cl-test)
 
-(package-documentation *documentation*)

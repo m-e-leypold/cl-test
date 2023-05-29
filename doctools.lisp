@@ -17,20 +17,31 @@
 ;;;
 ;;;  For alternative licensing options, see README.md
 
-(defpackage :de.m-e-leypold.cl-test/doctools
-  (:use :common-lisp)
+
+(in-package :de.m-e-leypold.cl-test/loading-ramp)
+
+;;; * Package definition  --------------------------------------------------------------------------
+
+(define-package :de.m-e-leypold.cl-test/doctools
+    "TODO doctools"
+
   (:export
-   :package-documentation)
+   :package-documentation
+   :define-package-documentation-anchor)
+
   (:import-from :de.m-e-leypold.cl-test/doctools-primitives
    :define-package-documentation-anchor))
       
 (in-package :de.m-e-leypold.cl-test/doctools)
+
+;;; * Define documentation anchors -----------------------------------------------------------------
 
 (defmacro package-documentation (name)
   (assert (typep name 'SYMBOL) nil
 	  "Argument to `PACKAGE-DOCUMENTATION` must be a symbol, but is ~S" name)
   `(define-package-documentation-anchor name))
 
-;; - TODO: Unindent / format package documentation string
+;;; * TODOs
+;;; - TODO: Unindent / format package documentation string
 
 
