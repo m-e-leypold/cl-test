@@ -18,3 +18,52 @@
 ;;;
 ;;;  For alternative licensing options, see README.md
 
+
+(defsystem "de.m-e-leypold.cl-test"
+  :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"
+  :licence "GPL3"
+  :description "Another Common Lisp testing framework"
+  :depends-on ()
+  :components ())
+
+(defsystem "de.m-e-leypold.cl-test/assert-based"
+  :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"
+  :licence "GPL3"
+  :description "CL-TEST assertion based testing support"
+  :depends-on ()
+  :components ())
+
+;;; * Tests  ---------------------------------------------------------------------------------------
+
+(defsystem "de.m-e-leypold.cl-test/tests"
+  :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"
+  :licence "GPL3"
+  :description "CL-TEST tests"
+  :depends-on ()
+  :components ())
+
+;;; * Examples  ------------------------------------------------------------------------------------
+
+(defsystem "de.m-e-leypold.cl-test/examples"
+  :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"
+  :licence "GPL3"
+  :description "CL-TEST examples"
+  :depends-on ()
+  :components ())
+
+;;; * Loader stubs  --------------------------------------------------------------------------------
+
+(defsystem "de.m-e-leypold.cl-test/load"
+  :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"
+  :licence "GPL3"
+  :description "Load all systems in CL-TEST"
+  :depends-on ("de.m-e-leypold.cl-test"
+	       "de.m-e-leypold.cl-test/assert-based"
+	       "de.m-e-leypold.cl-test/tests"))
+
+
+(defsystem "de.m-e-leypold.cl-test/prerequisites"
+  :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"
+  :licence "GPL3"
+  :description "Load all prerequisites for CL-TEST, see doc/ProjectStructure.org"
+  :depends-on ())

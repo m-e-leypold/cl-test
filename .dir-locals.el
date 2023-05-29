@@ -11,7 +11,7 @@
 			 (column-enforce-mode 1)
 			 (toggle-truncate-lines 1)))
 	       (fill-column . 95)
-	       (column-enforce-column . 110))))
+	       (column-enforce-column . 100))))
 
 ;; Note: outshine-startup-folded-p does not work (even as global
 ;; variable), perhaps because outshine mode is activated too late
