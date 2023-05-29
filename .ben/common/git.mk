@@ -54,7 +54,7 @@ setup:: git-setup
 
 # .PHONY: $(GIT-REMOTES:%=git-publish-to.%)
 
-git-pre-publish-check::
+GIT-PRE-PUBLISH-CHECK ?= check
 
 git-publish: git-pre-publish-check $(GIT-REMOTES:%=git-publish-to.%)
 
@@ -77,7 +77,7 @@ git-publish-to.origin:
 publish:: git-publish
 
 git-check-publishable-branch:
-	: Check if GIT-CURRENT-BRANCH is among thos that should/can be published.
+	: Check if GIT-CURRENT-BRANCH is among those that should/can be published.
 	$(SET-SH)
 	set -- $(filter $(GIT-CURRENT-BRANCH),$(GIT-PUBLIC-BRANCHES))
 	test $$# -eq 1
@@ -89,3 +89,4 @@ git-check-worktree-clean:
 	test "$$(git status -s | wc -l)" -eq 0
 
 git-pre-publish-check:: git-check-publishable-branch git-check-worktree-clean
+git-pre-publish-check:: $(GIT-PRE-PUBLISH-CHECK)
