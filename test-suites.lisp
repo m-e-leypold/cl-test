@@ -17,7 +17,7 @@
 ;;;
 ;;;  For alternative licensing options, see README.md
 
-(defpackage :de.m-e-leypold.de.cl-test/test-suites
+(defpackage :de.m-e-leypold.cl-test/test-suites
   
   (:documentation "
    This package defines the `TEST-SUITE' abstraction.
@@ -29,10 +29,10 @@
    :*documentation*)
   
   (:use :common-lisp)
-  (:import-from de.m-e-leypold.de.cl-test/doctools
+  (:import-from de.m-e-leypold.cl-test/doctools
    :package-documentation))
 
-(in-package :de.m-e-leypold.de.cl-test/test-suites)
+(in-package :de.m-e-leypold.cl-test/test-suites)
 
 (package-documentation *documentation*)
 

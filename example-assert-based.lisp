@@ -17,10 +17,10 @@
 ;;;
 ;;;  For alternative licensing options, see README.md
 
-(defpackage :de.m-e-leypold.de.cl-test/example/assert-based
-    (:use :common-lisp :de.m-e-leypold.de.cl-test/assert-based))
+(defpackage :de.m-e-leypold.cl-test/example/assert-based
+    (:use :common-lisp :de.m-e-leypold.cl-test/assert-based))
 
-(in-package :de.m-e-leypold.de.cl-test/example/assert-based)
+(in-package :de.m-e-leypold.cl-test/example/assert-based)
 
 (define-test* test-a ()
   "An assertion based test which will fail"

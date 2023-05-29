@@ -17,7 +17,7 @@
 ;;;
 ;;;  For alternative licensing options, see README.md
 
-(defpackage :de.m-e-leypold.de.cl-test/suites
+(defpackage :de.m-e-leypold.cl-test/suites
   (:documentation "
 
    This package serves as a kind of test registry. All symbols interned into this package are
@@ -31,7 +31,7 @@
    See `DE.M-E-LEYPOLD.CL-TEST.TEST-SUITES:TEST-SUITE`.
    "))
 
-(in-package :de.m-e-leypold.de.cl-test/suites)
+(in-package :de.m-e-leypold.cl-test/suites)
 
 
 

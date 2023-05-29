@@ -17,8 +17,8 @@
 ;;;
 ;;;  For alternative licensing options, see README.md
 
-(defpackage :de.m-e-leypold.de.cl-test/utils
+(defpackage :de.m-e-leypold.cl-test/utils
   (:use :common-lisp))
 
-(in-package :de.m-e-leypold.de.cl-test/utils)
+(in-package :de.m-e-leypold.cl-test/utils)
 

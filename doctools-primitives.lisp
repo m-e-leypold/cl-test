@@ -17,19 +17,26 @@
 ;;;
 ;;;  For alternative licensing options, see README.md
 
-(defpackage :de.m-e-leypold.cl-test
-  (:documentation "
-   TODO cl-test
-   ")
-
+(defpackage :de.m-e-leypold.cl-test/doctools-primitives
   (:use :common-lisp)
-  
   (:export
-   :*documentation*)
-  
-  (:import-from de.m-e-leypold.cl-test/doctools
-   :package-documentation))
-   
-(in-package :de.m-e-leypold.cl-test)
+   :define-package-documentation-anchor))
+      
+(in-package :de.m-e-leypold.cl-test/doctools-primitives)
 
-(package-documentation *documentation*)
+(defmacro define-package-documentation-anchor (name &optional package)
+  "
+  Defines NAME as a symbol that contains the package documentation
+  of the current package.
+
+  TODO: Background, rationale, usage. It's a DEFVAR.
+"
+  (if (not package) (setf package *package*))
+  
+  (let ((symbol
+	  (if (typep name 'SYMBOL) name (intern name package))))
+
+    `(defparameter ,symbol
+       ,(format nil "Proxy variable for documentation of ~S" *package*)
+       ,(documentation *package* t))))
+

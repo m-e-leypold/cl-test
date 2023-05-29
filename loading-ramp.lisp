@@ -17,19 +17,22 @@
 ;;;
 ;;;  For alternative licensing options, see README.md
 
-(defpackage :de.m-e-leypold.cl-test
-  (:documentation "
-   TODO cl-test
-   ")
-
+(defpackage :de.m-e-leypold.cl-test/loading-ramp
   (:use :common-lisp)
-  
-  (:export
-   :*documentation*)
-  
-  (:import-from de.m-e-leypold.cl-test/doctools
-   :package-documentation))
-   
-(in-package :de.m-e-leypold.cl-test)
+  (:import-from :common-lisp
+   :defpackage :in-package)
+  (:import-from :de.m-e-leypold.cl-test/doctools-primitives
+   :define-package-documentation-anchor))
 
-(package-documentation *documentation*)
+(in-package :de.m-e-leypold.cl-test/loading-ramp)
+
+(defmacro define-package (name doc-string &body body)
+  `(progn
+     (defpackage ,name
+       (:documentation ,doc-string)
+       ,@body
+       (:use :common-lisp) 
+       (:export :*documentation*))
+     (in-package :de.m-e-leypold.cl-test/assert-based)
+     (define-package-documentation-anchor "*DOCUMENTATION*")))
+

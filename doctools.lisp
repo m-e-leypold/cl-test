@@ -17,24 +17,19 @@
 ;;;
 ;;;  For alternative licensing options, see README.md
 
-(defpackage :de.m-e-leypold.de.cl-test/doctools
+(defpackage :de.m-e-leypold.cl-test/doctools
   (:use :common-lisp)
   (:export
-   :package-documentation))
+   :package-documentation)
+  (:import-from :de.m-e-leypold.cl-test/doctools-primitives
+   :define-package-documentation-anchor))
       
-(in-package :de.m-e-leypold.de.cl-test/doctools)
+(in-package :de.m-e-leypold.cl-test/doctools)
 
 (defmacro package-documentation (name)
-  "
-  Defines NAME as a symbol that contains the package documentation
-  of the current package.
-
-  TODO: Background, rationale, usage. It's a DEFVAR.
-"
-
-  `(defparameter ,name
-     ,(format nil "Proxy variable for documentation of ~S" *package*)
-     ,(documentation *package* t)))
+  (assert (typep name 'SYMBOL) nil
+	  "Argument to `PACKAGE-DOCUMENTATION` must be a symbol, but is ~S" name)
+  `(define-package-documentation-anchor name))
 
 ;; - TODO: Unindent / format package documentation string
 

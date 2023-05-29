@@ -17,23 +17,18 @@
 ;;;
 ;;;  For alternative licensing options, see README.md
 
-(defpackage :de.m-e-leypold.de.cl-test/assert-based
-  (:documentation "
-   TODO
-   ")
+(in-package :de.m-e-leypold.cl-test/loading-ramp)
 
-  (:use :common-lisp)
-  
-  (:export
-   :*documentation*   
-   :define-test*)
-  
-  (:import-from de.m-e-leypold.de.cl-test/doctools
-   :package-documentation))
-   
-(in-package :de.m-e-leypold.de.cl-test/assert-based)
+;;; * Package definition  --------------------------------------------------------------------------
 
-(package-documentation *documentation*)
+(define-package :de.m-e-leypold.cl-test/assert-based
+  "TODO assert-based
+  "
+  (:export :define-test*))
+
+(in-package :de.m-e-leypold.cl-test/assert-based)
+
+;;; * Defining tests  ------------------------------------------------------------------------------
 
 (defun doc-string-&-body (maybe-doc-string body)
   (if (typep maybe-doc-string '(SIMPLE-ARRAY CHARACTER))

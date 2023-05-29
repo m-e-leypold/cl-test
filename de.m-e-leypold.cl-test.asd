@@ -18,30 +18,46 @@
 ;;;
 ;;;  For alternative licensing options, see README.md
 
+;;  
 
 (defsystem "de.m-e-leypold.cl-test"
+
+  ;; Documentation see de.m-e-leypold.cl-test:*documentation*
+  
   :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"
   :licence "GPL3"
   :description "Another Common Lisp testing framework"
-  :depends-on ("de.m-e-leypold.cl-test/common-layer")
+  :depends-on ("de.m-e-leypold.cl-test/loading-ramp"
+	       "de.m-e-leypold.cl-test/common-layer")
   :components ((:file "cl-test")))
 
 (defsystem "de.m-e-leypold.cl-test/assert-based"
+
+  ;; Documentation see de.m-e-leypold.cl-test/assert-based:*documentation*
+  
   :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"
   :licence "GPL3"
   :description "CL-TEST assertion based testing support"
-  :depends-on ("de.m-e-leypold.cl-test/common-layer")
+  :depends-on ("de.m-e-leypold.cl-test/loading-ramp"
+	       "de.m-e-leypold.cl-test/common-layer")
   :components ((:file "assert-based")))
 
 (defsystem "de.m-e-leypold.cl-test/common-layer"
   :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"
   :licence "GPL3"
   :description "CL-TEST common abstractions and utilities"
-  :depends-on ()
+  :depends-on ("de.m-e-leypold.cl-test/loading-ramp")
   :components ((:file "doctools")
 	       (:file "suites")
 	       (:file "test-suites")))
-  
+
+(defsystem "de.m-e-leypold.cl-test/loading-ramp"
+  :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"
+  :licence "GPL3"
+  :description "Loading ramp mechanism for CL-TEST"
+  :depends-on ()
+  :components ((:file "doctools-primitives")
+	       (:file "loading-ramp")))
 
 ;;; * Tests  ---------------------------------------------------------------------------------------
 
@@ -71,8 +87,8 @@
   :description "Load all systems in CL-TEST"
   :depends-on ("de.m-e-leypold.cl-test"
 	       "de.m-e-leypold.cl-test/assert-based"
-	       "de.m-e-leypold.cl-test/tests"))
-
+	       "de.m-e-leypold.cl-test/tests"
+	       "de.m-e-leypold.cl-test/examples"))
 
 (defsystem "de.m-e-leypold.cl-test/prerequisites"
   :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"

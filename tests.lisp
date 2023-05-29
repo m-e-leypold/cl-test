@@ -17,5 +17,5 @@
 ;;;
 ;;;  For alternative licensing options, see README.md
 
-(defpackage :de.m-e-leypold.de.cl-test/tests)
-(in-package :de.m-e-leypold.de.cl-test/tests)
+(defpackage :de.m-e-leypold.cl-test/tests)
+(in-package :de.m-e-leypold.cl-test/tests)
