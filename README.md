@@ -3,6 +3,38 @@ cl-test -- Another test framework for common lisp
 
 (WIP)
 
+Documentation
+-------------
+
+Documentation of this system is available as extensively linked
+documentation strings in the packages themselves. *Slime* here
+functions as hypertext facility using `C-c C-d C-d`
+(`slime-describe-symbol`).
+
+In order to read the documentation you need
+
+- Emacs.
+- Load *slime* and start a lisp REPL (only SBCL works these days).
+- Load "tests.lisp" or "load.lisp" with `C-c C-l`
+  (`slime-load-file`). It is recommended to run the tests at the
+  beginning so you know everything is working with your platform
+  properly.
+- Then continue with the package documentation string as described below.
+
+In the following block, position the cursor on `*DOCUMENTATION*` and run `M-x
+slime-describe-symbol`. This should open a `*slime-description*`
+buffer with the package documentation string from where you can follow
+to the referenced functions and variables.
+
+	(in-package :de.m-e-leypold.de.cl-test/assert-based)
+    *documentation*  ;; M-x slime-describe-symbol on this
+	
+	(in-package :de.m-e-leypold.de.cl-test)
+    *documentation*  ;; M-x slime-describe-symbol on this
+
+In the above block the `in-package` stanzas exist only for the benefit
+of *slime* as a hint in which package to look up `*documentation*`.
+
 License
 -------
 

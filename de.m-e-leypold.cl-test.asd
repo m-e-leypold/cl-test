@@ -23,15 +23,25 @@
   :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"
   :licence "GPL3"
   :description "Another Common Lisp testing framework"
-  :depends-on ()
-  :components ())
+  :depends-on ("de.m-e-leypold.cl-test/common-layer")
+  :components ((:file "cl-test")))
 
 (defsystem "de.m-e-leypold.cl-test/assert-based"
   :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"
   :licence "GPL3"
   :description "CL-TEST assertion based testing support"
+  :depends-on ("de.m-e-leypold.cl-test/common-layer")
+  :components ((:file "assert-based")))
+
+(defsystem "de.m-e-leypold.cl-test/common-layer"
+  :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"
+  :licence "GPL3"
+  :description "CL-TEST common abstractions and utilities"
   :depends-on ()
-  :components ())
+  :components ((:file "doctools")
+	       (:file "suites")
+	       (:file "test-suites")))
+  
 
 ;;; * Tests  ---------------------------------------------------------------------------------------
 
@@ -39,8 +49,9 @@
   :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"
   :licence "GPL3"
   :description "CL-TEST tests"
-  :depends-on ()
-  :components ())
+  :depends-on ("de.m-e-leypold.cl-test/assert-based"
+	       "de.m-e-leypold.cl-test/examples")
+  :components ((:file "tests")))
 
 ;;; * Examples  ------------------------------------------------------------------------------------
 
@@ -48,8 +59,9 @@
   :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"
   :licence "GPL3"
   :description "CL-TEST examples"
-  :depends-on ()
-  :components ())
+  :depends-on ("de.m-e-leypold.cl-test"
+	       "de.m-e-leypold.cl-test/assert-based")
+  :components ((:file "example-assert-based")))
 
 ;;; * Loader stubs  --------------------------------------------------------------------------------
 
