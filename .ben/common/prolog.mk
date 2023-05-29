@@ -22,6 +22,7 @@ clean::
 cleaner::
 setup::
 publish::
+check::
 
 .PHONY: all init clean cleaner setup
 

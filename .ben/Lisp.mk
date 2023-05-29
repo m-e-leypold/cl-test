@@ -27,6 +27,28 @@ endif
 
 PRODUCT-NAME = $(lastword $(subst ., ,$(ASD-FILE:%.asd=%)))
 
+LISP-IMPLEMENTATION ?= sbcl
+LISP-IMPLEMENTATION := $(strip $(LISP-IMPLEMENTATION))
+
+# * Testing --------------------------------------------------------------------
+
+LISP-TEST-RUNNER ?= $(wildcard test.lisp)
+
+ifneq ($(strip $(LISP-TEST-RUNNER)),)
+check::
+	: Run tests written in lisp.
+	$(SET-SH)
+	$(LISP-$(LISP-IMPLEMENTATION)-RUN-TEST)
+	:
+endif
+
+# * Implementations  -----------------------------------------------------------
+
+LISP-sbcl-RUN-TEST = \
+	sbcl --noinform --disable-debugger --load $(LISP-TEST-RUNNER) --quit
+
+# * More modules from 'common' -------------------------------------------------
+
 include $(BEN)/common/project.mk
 include $(BEN)/common/git.mk
 include $(BEN)/epilog.mk
