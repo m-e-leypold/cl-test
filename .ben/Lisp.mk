@@ -32,6 +32,8 @@ include $(BEN)/common/project.mk
 LISP-IMPLEMENTATION ?= sbcl
 LISP-IMPLEMENTATION := $(strip $(LISP-IMPLEMENTATION))
 
+ALL-LISP-IMPLEMENTATIONS += sbcl ecl cmucl
+
 $(info )
 $(info LISP-IMPLEMENTATION = $(LISP-IMPLEMENTATION))
 $(info ASD-FILE            = $(ASD-FILE))
@@ -43,17 +45,42 @@ LISP-TEST-RUNNER ?= $(wildcard test.lisp)
 $(info LISP-TEST-RUNNER    = $(LISP-TEST-RUNNER))
 
 ifneq ($(strip $(LISP-TEST-RUNNER)),)
-check::
+
+check-with-%::
 	: Run tests written in lisp.
 	$(SET-SH)
-	$(LISP-$(LISP-IMPLEMENTATION)-RUN-TEST)
+	$(LISP-$*-RUN-TEST)
 	:
+
+full-check:: $(ALL-LISP-IMPLEMENTATIONS:%=check-with-%)
+quick-check:: check-with-$(LISP-IMPLEMENTATION)
+check:: check-with-$(LISP-IMPLEMENTATION)
+
 endif
 
 # * Implementations  -----------------------------------------------------------
 
+# TODO: Technically the LISP-*-RUN-TEST should exist dependend on test status.
+#       But also when loading TEST-RUNNER we do not want to exit even on failure,
+#       at least not alway, when we're in slime.
+#
+#       This needs some general research to understand how we want the
+#       interface of TEST-RUNNER to work as general as possible
+#       (possibility would be command line parameters or environment
+#       variable) if conditions alone do not suffice.
+
+# ** SBCL  ---------------------------------------------------------------------
+
 LISP-sbcl-RUN-TEST = \
 	sbcl --noinform --disable-debugger --load $(LISP-TEST-RUNNER) --quit
+
+# ** ECL  ----------------------------------------------------------------------
+
+LISP-ecl-RUN-TEST = \
+	ecl -q --shell $(LISP-TEST-RUNNER)
+
+LISP-cmucl-RUN-TEST = \
+	cmucl  -load $(LISP-TEST-RUNNER) -eval "(quit)"
 
 # * More modules from 'common' -------------------------------------------------
 
