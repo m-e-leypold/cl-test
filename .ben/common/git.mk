@@ -54,7 +54,7 @@ setup:: git-setup
 
 # .PHONY: $(GIT-REMOTES:%=git-publish-to.%)
 
-GIT-PRE-PUBLISH-CHECK ?= check
+GIT-PRE-PUBLISH-CHECK ?= full-check
 
 git-publish: git-pre-publish-check $(GIT-REMOTES:%=git-publish-to.%)
 

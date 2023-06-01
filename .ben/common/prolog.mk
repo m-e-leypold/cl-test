@@ -23,6 +23,8 @@ cleaner::
 setup::
 publish::
 check::
+quick-check::
+full-check::
 
 .PHONY: all init clean cleaner setup
 
