@@ -26,23 +26,27 @@ $(error No or more than one .asd file: $(ASD-FILE))
 endif
 
 PRODUCT-NAME = $(lastword $(subst ., ,$(ASD-FILE:%.asd=%)))
+SYSTEM-NAME  = $(ASD-FILE:%.asd=%)
 
 include $(BEN)/common/project.mk
 
-LISP-IMPLEMENTATION ?= sbcl
+ALL-LISP-IMPLEMENTATIONS ?= sbcl ecl cmucl clisp
+
+LISP-IMPLEMENTATION ?= $(firstword $(ALL-LISP-IMPLEMENTATIONS))
 LISP-IMPLEMENTATION := $(strip $(LISP-IMPLEMENTATION))
 
-ALL-LISP-IMPLEMENTATIONS += sbcl ecl cmucl
-
 $(info )
-$(info LISP-IMPLEMENTATION = $(LISP-IMPLEMENTATION))
-$(info ASD-FILE            = $(ASD-FILE))
+$(info SYSTEM-NAME             = $(SYSTEM-NAME))
+$(info ASD-FILE                = $(ASD-FILE))
+$(info LISP-IMPLEMENTATION     = $(LISP-IMPLEMENTATION))
+$(info ALL-LISP-IMPLEMENTATION = $(ALL-LISP-IMPLEMENTATIONS))
+
 
 # * Testing --------------------------------------------------------------------
 
 LISP-TEST-RUNNER ?= $(wildcard test.lisp)
 
-$(info LISP-TEST-RUNNER    = $(LISP-TEST-RUNNER))
+$(info LISP-TEST-RUNNER        = $(LISP-TEST-RUNNER))
 
 ifneq ($(strip $(LISP-TEST-RUNNER)),)
 
@@ -79,8 +83,17 @@ LISP-sbcl-RUN-TEST = \
 LISP-ecl-RUN-TEST = \
 	ecl -q --shell $(LISP-TEST-RUNNER)
 
+# ** CMUCL  --------------------------------------------------------------------
+
 LISP-cmucl-RUN-TEST = \
 	cmucl  -load $(LISP-TEST-RUNNER) -eval "(quit)"
+
+# ** CLISP  --------------------------------------------------------------------
+
+CLISP-INIT-FILE = $(HOME)/.clisprc.lisp
+
+LISP-clisp-RUN-TEST = \
+	clisp --silent -i $(CLISP-INIT-FILE) $(LISP-TEST-RUNNER)
 
 # * More modules from 'common' -------------------------------------------------
 
