@@ -30,7 +30,7 @@ SYSTEM-NAME  = $(ASD-FILE:%.asd=%)
 
 include $(BEN)/common/project.mk
 
-ALL-LISP-IMPLEMENTATIONS ?= sbcl ecl cmucl clisp
+ALL-LISP-IMPLEMENTATIONS ?= sbcl ecl ccl cmucl clisp
 
 LISP-IMPLEMENTATION ?= $(firstword $(ALL-LISP-IMPLEMENTATIONS))
 LISP-IMPLEMENTATION := $(strip $(LISP-IMPLEMENTATION))
@@ -94,6 +94,10 @@ CLISP-INIT-FILE = $(HOME)/.clisprc.lisp
 
 LISP-clisp-RUN-TEST = \
 	clisp --silent -i $(CLISP-INIT-FILE) $(LISP-TEST-RUNNER)
+
+# ** CCL -----------------------------------------------------------------------
+
+LISP-ccl-RUN-TEST = ccl  --load $(LISP-TEST-RUNNER) --eval '(quit)'
 
 # * More modules from 'common' -------------------------------------------------
 
