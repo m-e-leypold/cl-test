@@ -23,5 +23,4 @@
 
 ;;; TODO: Actually run the tests.
 
-(assert nil)
 
