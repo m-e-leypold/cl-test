@@ -23,4 +23,5 @@
 
 ;;; TODO: Actually run the tests.
 
-(format t "~%No tests are implemented yet~%")
+(assert nil)
+

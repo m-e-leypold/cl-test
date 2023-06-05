@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-BEN := $(dir $(lastword $(MAKEFILE_LIST)))
+BEN := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 
 include $(BEN)/prolog.mk
 
@@ -86,7 +86,7 @@ LISP-ecl-RUN-TEST = \
 # ** CMUCL  --------------------------------------------------------------------
 
 LISP-cmucl-RUN-TEST = \
-	cmucl  -load $(LISP-TEST-RUNNER) -eval "(quit)"
+	cmucl  -quiet -batch -load $(LISP-TEST-RUNNER) -eval "(quit)"
 
 # ** CLISP  --------------------------------------------------------------------
 
@@ -97,11 +97,12 @@ LISP-clisp-RUN-TEST = \
 
 # ** CCL  ----------------------------------------------------------------------
 
-LISP-ccl-RUN-TEST = ccl  --load $(LISP-TEST-RUNNER) --eval '(quit)'
+LISP-ccl-RUN-TEST = ccl -b -Q --load $(LISP-TEST-RUNNER) # --eval '(quit)'
 
 # ** ABCL  ---------------------------------------------------------------------
 
-LISP-abcl-RUN-TEST = abcl --batch --load $(LISP-TEST-RUNNER)
+LISP-abcl-RUN-TEST = \
+	abcl --noinform --batch --load $(BEN)/abcl-batch.lisp test.lisp $(LISP-TEST-RUNNER)
 
 # ** CLASP  --------------------------------------------------------------------
 
