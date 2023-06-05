@@ -97,12 +97,13 @@ LISP-clisp-RUN-TEST = \
 
 # ** CCL  ----------------------------------------------------------------------
 
-LISP-ccl-RUN-TEST = ccl -b -Q --load $(LISP-TEST-RUNNER) # --eval '(quit)'
+LISP-ccl-RUN-TEST = ccl -b -Q --load $(LISP-TEST-RUNNER) --eval '(quit)'
 
 # ** ABCL  ---------------------------------------------------------------------
 
 LISP-abcl-RUN-TEST = \
-	abcl --noinform --batch --load $(BEN)/abcl-batch.lisp test.lisp $(LISP-TEST-RUNNER)
+	abcl --noinform --batch \
+             --load $(BEN)/abcl-batch.lisp test.lisp $(LISP-TEST-RUNNER)
 
 # ** CLASP  --------------------------------------------------------------------
 
