@@ -26,14 +26,14 @@ slime-describe-symbol`. This should open a `*slime-description*`
 buffer with the package documentation string from where you can follow
 to the referenced functions and variables.
 
-	(in-package :de.m-e-leypold.de.cl-test/assert-based)
+```common-lisp
+	(in-package :de.m-e-leypold.cl-test)
     *documentation*  ;; M-x slime-describe-symbol on this
-	
-	(in-package :de.m-e-leypold.de.cl-test)
-    *documentation*  ;; M-x slime-describe-symbol on this
+```
 
 In the above block the `in-package` stanzas exist only for the benefit
 of *slime* as a hint in which package to look up `*documentation*`.
+
 
 License
 -------
@@ -57,8 +57,5 @@ License
     For altermative licensing options, see README.md
 
 See [LICENSE.md](./LICENSE.md) for the full license text.
-
-
-
 
 

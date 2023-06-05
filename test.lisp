@@ -21,6 +21,9 @@
 (declaim (optimize (speed 0) (space 0) (compilation-speed 0) (debug 3) (safety 3)))
 (asdf:load-system "de.m-e-leypold.cl-test/tests")
 
-;;; TODO: Actually run the tests.
+;; For the moment: Run the test(s) explicitely as procedures
+
+(de.m-e-leypold.cl-test/tests:examples-load-properly)
+
 
 

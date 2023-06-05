@@ -35,20 +35,25 @@
       (values nil (cons maybe-doc-string body))))
 
 (defmacro define-test*
-    (name (&rest empty-list) maybe-doc-string &body body)
-  (assert (not empty-list) nil
-	  (format nil
-		  "lambda list passed to (define-test ~A ...) must be empty, is ~S instead"
-		  name
-		  empty-list))
-  (multiple-value-bind (doc-string body) (doc-string-&-body maybe-doc-string body)
+    (name (&rest empty-lambda-list)  &body maybe-docstring+body)
+  (let* ((maybe-docstring (car maybe-docstring+body))
+	 (body (cdr maybe-docstring+body))
+	 (docstring maybe-docstring))
+    (if (not (and (typep maybe-docstring 'string) body))
+	(progn
+	  (setf docstring nil)
+	  (setf body maybe-docstring+body)))
+
+    (assert docstring nil
+	    (format t "*** Doctrings are at the moment required for (DEFINE-TEST* ~S ...)"
+		    name))
     `(progn
        (defun ,name ()
-	 ,doc-string
-	 (progn           ;; will convert simple error to test failure later [TODO]
-	   ,@body))
-       )))
-    
-	 
-	 
+	 ,docstring
+	 (progn
+	   ,@body
+	   )))))
+
+;;; TODO: Register package as suite
+;;; TODO: Automatically export
 

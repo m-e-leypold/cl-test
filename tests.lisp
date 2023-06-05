@@ -21,7 +21,18 @@
 
 ;;; * Package definition  --------------------------------------------------------------------------
 
-(define-package :de.m-e-leypold.cl-test/tests
+(define-package :de.m-e-leypold.cl-test/tests 
     "TODO: Tests"
-  )
+  (:use :common-lisp :de.m-e-leypold.cl-test/assert-based)
+  (:export :examples-load-properly))
+
 (in-package :de.m-e-leypold.cl-test/tests)
+
+(define-test* examples-load-properly ()
+  "
+
+  Try to load the examples. If this fails, we have a problem with the syntax macros.
+"
+  (asdf:load-system "de.m-e-leypold.cl-test/examples" :force T))
+
+

@@ -65,8 +65,7 @@
   :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"
   :licence "GPL3"
   :description "CL-TEST tests"
-  :depends-on ("de.m-e-leypold.cl-test/assert-based"
-	       "de.m-e-leypold.cl-test/examples")
+  :depends-on ("de.m-e-leypold.cl-test/assert-based")
   :components ((:file "tests")))
 
 ;;; * Examples  ------------------------------------------------------------------------------------

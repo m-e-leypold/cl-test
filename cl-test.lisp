@@ -22,7 +22,12 @@
 ;;; * Package definition  --------------------------------------------------------------------------
 
 (define-package :de.m-e-leypold.cl-test
-    "TODO cl-test")
+    "
+    CL-TEST will be a test and specification documentation framework for Common Lisp.
+
+    At the moment development focuses on simple assert based tests. More information about this
+    interface can be found in `DE.M-E-LEYPOLD.CL-TEST/ASSERT-BASED:*DOCUMENTATION*'.
+")
 
 (in-package :de.m-e-leypold.cl-test)
 
