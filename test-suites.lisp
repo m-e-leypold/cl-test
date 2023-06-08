@@ -1,17 +1,17 @@
 ;;;
 ;;;  cl-test -- another test framework for common lisp.
 ;;;  Copyright (C) 2022  M E Leypold
-;;;  
+;;;
 ;;;  This program is free software: you can redistribute it and/or modify
 ;;;  it under the terms of the GNU General Public License as published by
 ;;;  the Free Software Foundation, either version 3 of the License, or
 ;;;  (at your option) any later version.
-;;;  
+;;;
 ;;;  This program is distributed in the hope that it will be useful,
 ;;;  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;  GNU General Public License for more details.
-;;;  
+;;;
 ;;;  You should have received a copy of the GNU General Public License
 ;;;  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ;;;
@@ -23,19 +23,26 @@
 ;;; * Package definition  --------------------------------------------------------------------------
 
 (define-package :de.m-e-leypold.cl-test/test-suites
-  
+
     "This package defines the `TEST-SUITE' abstraction.
 
      TODO: Explain more, refer to other packages.
     "
-  (:export :register-test))
+  (:export :register-test :with-new-suite-registry))
 
 (in-package :de.m-e-leypold.cl-test/test-suites)
 
 ;;; * Suite registry -------------------------------------------------------------------------------
 
-(defparameter *suites-package* (find-package "DE.M-E-LEYPOLD.CL-TEST/SUITES"))
-(defparameter *suites*         '())
+(defparameter *suites-package*  (find-package "DE.M-E-LEYPOLD.CL-TEST/SUITES"))
+(defparameter *suites*          '())
+(defparameter *suite-instances* (make-hash-table))
+
+(defmacro with-new-suite-registry ((&optional package) &body body)
+  `(let ((*suites*          '())
+	 (*suite-instances* (make-hash-table))
+	 (*suites-package*  ,package))
+     ,@body))
 
 ;;; * defclass TEST-SUITE  -------------------------------------------------------------------------
 
@@ -59,48 +66,65 @@
     :documentation "Tests in the suite, as symbols")
    ))
 
+;; TODO: Printing of test suites
+;; TODO: Also capture package
+
 (let ((keyword-package (find-package :keyword)))
+
   (defun get-or-create-suite (package)
     (let* ((package-name (package-name package))
-	   (package-symbol (find-symbol package-name *suites-package*)))
+	   (suite-id (intern package-name keyword-package))
+	   (test-suite (gethash suite-id *suite-instances* nil)))
 
-      ;; if we have the package symbol already registered in *SUITES-PACKAGE* and its bound,
-      ;; it must be bound to the TEST-SUITE instance.
-          
-      (if (and package-symbol (boundp package-symbol))
-	  (symbol-value package-symbol)
+      ;; Do we have the suite already?
 
-	  ;; Otherwise we have to create TEST-SUITE instance and bind it.
-	  
-	  (let* ((package-symbol (intern package-name *suites-package*))
-		 (suite-id (intern package-name keyword-package)))
+      (if test-suite
+	  test-suite
 
-	    (proclaim `(special ,package-symbol))	    
-	    (export (list package-symbol) *suites-package*) 
+	  ;; Otherwise we have to create a TEST-SUITE instance and bind it.
+
+	  (let* ((package-symbol
+		   (if *suites-package*
+		       (intern package-name *suites-package*)
+		       nil)))
+
+	    (if package-symbol
+		(progn
+		  (proclaim `(special ,package-symbol))	   
+		  (export (list package-symbol) *suites-package*)))
 	    
 	    #+nil (format t "Registering: ~S~%" package-symbol) ; TODO: Need a logging package
-
+	    
 	    (let ((test-suite
 		    (make-instance 'test-suite :suite-id suite-id :suite-symbol package-symbol)))
-	      (setf (symbol-value package-symbol) test-suite)
+	      (if package-symbol
+		  (setf (symbol-value package-symbol) test-suite))
+	      (pushnew suite-id *suites*)
+	      (setf (gethash suite-id *suite-instances*) test-suite)
+	      (format t "*suites* => ~S~%" *suites*) ; TODO: Need a logging package
 	      test-suite))))))
+
+
+(declaim (ftype (function (symbol test-suite)) add-test))
+
+(defun add-test (test-symbol suite)
+  (pushnew test-symbol (slot-value suite 'suite-tests)))
+
+
+;; TODO RUN-SUITE, bind run-suite wrapper
+;; TODO get-suites (return symbol list, just for filtering?)
 
 ;;; * Registering tests  ---------------------------------------------------------------------------
 
   ;; TODO: Make accessible as global var.
-  
+
 (defun register-test (symbol)
   "
-  Register symbol in `TEST-SUITE', implicitelky define SYMBOL-PACKAGE to be a test suite.
+  Register symbol in `TEST-SUITE', implicitely define SYMBOL-PACKAGE to be a test suite.
 "
   (let ((package (symbol-package symbol)))
     (assert (eq package *package*) nil
 	    (format t "*** (SYMBOL-PACKAGE '~S) = ~S is not *PACKAGE* = ~S when registering test"
 		    symbol package *package*))
     (let ((suite (get-or-create-suite package)))
-
-      ;; TODO TEST-SUITE instance, bind
-      ;; TODO Put suite in *SUITES*
-      ;; TODO RUN-SUITE, bind run-suite wrapper
-      ;; TODO: Register symbol with package/suite.         
-      )))
+      (add-test symbol suite))))

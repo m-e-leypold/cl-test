@@ -24,7 +24,9 @@
 
 (define-package :de.m-e-leypold.cl-test/tests 
     "TODO: Tests"
-  (:use :common-lisp :de.m-e-leypold.cl-test/assert-based))
+  (:use :common-lisp :de.m-e-leypold.cl-test/assert-based)
+  (:import-from :de.m-e-leypold.cl-test/test-suites
+   :with-new-suite-registry))
 
 (in-package :de.m-e-leypold.cl-test/tests)
 
@@ -35,7 +37,9 @@
   "
   Try to load the examples. If this fails, we have a problem with the syntax macros.
 "
-  ;; TODO: Make this into a special assert "assert-asdf-loads"
-  ;;
-  (asdf:operate 'asdf:load-op "de.m-e-leypold.cl-test/examples" :force T))
+  (with-new-suite-registry ()
+    ;; TODO: Make this into a special assert "assert-asdf-loads"?
+    (asdf:operate 'asdf:load-op "de.m-e-leypold.cl-test/examples" :force T)
+    (assert (equal de.m-e-leypold.cl-test/test-suites::*suites*
+		   '(:de.m-e-leypold.cl-test/example/assert-based))))) 
 
