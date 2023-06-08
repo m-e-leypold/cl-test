@@ -26,7 +26,11 @@
     "TODO: Tests"
   (:use :common-lisp :de.m-e-leypold.cl-test/assert-based)
   (:import-from :de.m-e-leypold.cl-test/test-suites
-   :with-new-suite-registry))
+   :with-new-suite-registry
+   :get-suites :suite-id
+   )
+  (:export
+   :examples-load-properly))
 
 (in-package :de.m-e-leypold.cl-test/tests)
 
@@ -42,5 +46,9 @@
     (asdf:operate 'asdf:load-op "de.m-e-leypold.cl-test/examples" :force T)
     (assert (equal de.m-e-leypold.cl-test/test-suites::*suites*
 		   '(:de.m-e-leypold.cl-test/example/assert-based-2
-		     :de.m-e-leypold.cl-test/example/assert-based)))))
+		     :de.m-e-leypold.cl-test/example/assert-based)))
+    (let ((suites (get-suites)))
+      (assert (equal (mapcar #'suite-id suites)
+		     '(:de.m-e-leypold.cl-test/example/assert-based
+		       :de.m-e-leypold.cl-test/example/assert-based-2))))))
 

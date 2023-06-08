@@ -47,3 +47,9 @@
     (let ((suite (get-or-create-suite package)))
       (add-test symbol suite))))
 
+
+;; TODO: TEST-DESCRIPTOR (mostly as container for flags)
+;; TODO: get-suite (from some signifier)
+;; TODO: get-tests (null/:all) => gets us all tests
+;; TODO: do-tests (suite var ...)
+

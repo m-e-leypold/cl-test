@@ -28,7 +28,7 @@
 
      TODO: Explain more, refer to other packages.
     "
-  (:export :with-new-suite-registry))
+  (:export :with-new-suite-registry :do-suites :get-suites :get-test-ids :suite-symbol :suite-id))
 
 (in-package :de.m-e-leypold.cl-test/test-suites)
 
@@ -43,6 +43,16 @@
 	 (*suite-instances* (make-hash-table))
 	 (*suites-package*  ,package))
      ,@body))
+
+(defun get-suites ()
+  (nreverse
+   (mapcar #'(lambda (id) (gethash id *suite-instances*)) *suites*)))
+
+(defmacro do-suites ((suite-var) &body body)
+  `(progn
+     (dolist ((,suite-var (get-suites)))
+       ,@body)))
+
 
 ;;; * defclass TEST-SUITE  -------------------------------------------------------------------------
 
@@ -109,3 +119,7 @@
 (defun add-test (test-symbol suite)
   (pushnew test-symbol (slot-value suite 'suite-tests)))
 
+(defun get-test-ids (suite)
+  (reverse (suite-tests suite)))
+
+;; TODO: get-suite (from some signifier)
