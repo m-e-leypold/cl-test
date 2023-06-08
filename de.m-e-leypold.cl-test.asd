@@ -77,7 +77,8 @@
   :description "CL-TEST examples"
   :depends-on ("de.m-e-leypold.cl-test"
 	       "de.m-e-leypold.cl-test/assert-based")
-  :components ((:file "example-assert-based")))
+  :components ((:file "example-assert-based")
+	       (:file "example-assert-based-2")))
 
 ;;; * Loader stubs  --------------------------------------------------------------------------------
 

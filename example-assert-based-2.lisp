@@ -19,27 +19,15 @@
 
 (declaim (optimize (speed 0) (space 0) (compilation-speed 0) (debug 3) (safety 3)))
 
-(defpackage :de.m-e-leypold.cl-test/example/assert-based
+(defpackage :de.m-e-leypold.cl-test/example/assert-based-2
   (:use :common-lisp :de.m-e-leypold.cl-test/assert-based)
   (:export
    :a-test-that-will-fail
    :a-test-that-will-pass))
 
-;; Note regarding (:export :test-a): Normally you do not *need* to export the tests, this is
-;; done automatically and running a test with the framework function doesn't need the symbol
-;; exported anyway (the framework functions us DE.M-E-LEYPOLD.CL-TEST/TEST-SUITES::*SUITES* to
-;; translate selectors into a list of tests).
-;;
-;; In this case, though, in the tests of this package (see
-;; DE.M-E-LEYPOLD.CL-TEST/TESTS:DOCUMENTATION*) we force-reload this package repeatedly in
-;; DE.M-E-LEYPOLD.CL-TEST/TESTS:EXAMPLES-LOAD-PROPERLY. This will (at least under SBCL) lead to
-;; discovery of package variance (the in-system package export list is different from that
-;; given in defpackage) and ASDF seems to interprete the warning as an error (not so sure about
-;; the latter, though).
-;;
-;; Anyway: Explicitely exporting the symbol fixes the error from force-reloading with ASDF.
+;; Regarding (:export :test-a): See note in DE.M-E-LEYPOLD.CL-TEST/EXAMPLE/ASSERT-BASED-2.
 
-(in-package :de.m-e-leypold.cl-test/example/assert-based)
+(in-package :de.m-e-leypold.cl-test/example/assert-based-2)
 
 (define-test* a-test-that-will-fail ()
   "An assertion based test which will fail"

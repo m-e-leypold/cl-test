@@ -63,8 +63,7 @@
     :type (or (cons symbol) null)
     :accessor suite-tests
     :initform '()
-    :documentation "Tests in the suite, as symbols")
-   ))
+    :documentation "Tests in the suite, as symbols")))
 
 ;; TODO: Printing of test suites
 ;; TODO: Also capture package

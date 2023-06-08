@@ -41,5 +41,6 @@
     ;; TODO: Make this into a special assert "assert-asdf-loads"?
     (asdf:operate 'asdf:load-op "de.m-e-leypold.cl-test/examples" :force T)
     (assert (equal de.m-e-leypold.cl-test/test-suites::*suites*
-		   '(:de.m-e-leypold.cl-test/example/assert-based))))) 
+		   '(:de.m-e-leypold.cl-test/example/assert-based-2
+		     :de.m-e-leypold.cl-test/example/assert-based)))))
 
