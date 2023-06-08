@@ -17,22 +17,25 @@
 ;;;
 ;;;  For alternative licensing options, see README.md
 
+(declaim (optimize (speed 0) (space 0) (compilation-speed 0) (debug 3) (safety 3)))
 (in-package :de.m-e-leypold.cl-test/loading-ramp)
 
 ;;; * Package definition  --------------------------------------------------------------------------
 
 (define-package :de.m-e-leypold.cl-test/tests 
     "TODO: Tests"
-  (:use :common-lisp :de.m-e-leypold.cl-test/assert-based)
-  (:export :examples-load-properly))
+  (:use :common-lisp :de.m-e-leypold.cl-test/assert-based))
 
 (in-package :de.m-e-leypold.cl-test/tests)
 
+
+;;; * Tests  ---------------------------------------------------------------------------------------
+
 (define-test* examples-load-properly ()
   "
-
   Try to load the examples. If this fails, we have a problem with the syntax macros.
 "
-  (asdf:load-system "de.m-e-leypold.cl-test/examples" :force T))
-
+  ;; TODO: Make this into a special assert "assert-asdf-loads"
+  ;;
+  (asdf:operate 'asdf:load-op "de.m-e-leypold.cl-test/examples" :force T))
 

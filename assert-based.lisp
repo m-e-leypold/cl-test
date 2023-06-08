@@ -23,7 +23,9 @@
 
 (define-package :de.m-e-leypold.cl-test/assert-based
     "TODO assert-based"  
-  (:export :define-test*))
+  (:export :define-test*)
+  (:import-from :de.m-e-leypold.cl-test/test-suites
+   :register-test))
 
 (in-package :de.m-e-leypold.cl-test/assert-based)
 
@@ -43,17 +45,16 @@
 	(progn
 	  (setf docstring nil)
 	  (setf body maybe-docstring+body)))
-
-    (assert docstring nil
-	    (format t "*** Doctrings are at the moment required for (DEFINE-TEST* ~S ...)"
-		    name))
     `(progn
+       (export (quote ,name))
        (defun ,name ()
 	 ,docstring
 	 (progn
 	   ,@body
-	   )))))
+	   ))
+       (register-test (quote ,name)))))
 
 ;;; TODO: Register package as suite
 ;;; TODO: Automatically export
-
+;;; TODO: Abstract body parsing into parse-function-body and with-parsed-function-body
+;;; TODO: Convert escaping conditions to test failures

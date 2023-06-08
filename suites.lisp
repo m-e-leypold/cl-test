@@ -23,7 +23,7 @@
 
 (define-package :de.m-e-leypold.cl-test/suites
     
-    "This package serves as a kind of test registry. All symbols interned into this package are
+    "This package serves as a kind of test suite registry. All symbols interned into this package are
      global variables, are bound to an instance of
      `DE.M-E-LEYPOLD.CL-TEST.TEST-SUITES:TEST-SUITE` that refers to a package that is a test
      suite and the `CL:SYMBOL-NAME` of those symbols are identical to the package names.

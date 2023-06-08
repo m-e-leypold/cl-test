@@ -17,8 +17,25 @@
 ;;;
 ;;;  For alternative licensing options, see README.md
 
+(declaim (optimize (speed 0) (space 0) (compilation-speed 0) (debug 3) (safety 3)))
+
 (defpackage :de.m-e-leypold.cl-test/example/assert-based
-  (:use :common-lisp :de.m-e-leypold.cl-test/assert-based))
+  (:use :common-lisp :de.m-e-leypold.cl-test/assert-based)
+  (:export :test-a))
+
+;; Note regarding (:export :test-a): Normally you do not *need* to export the tests, this is
+;; done automatically and running a test with the framework function doesn't need the symbol
+;; exported anyway (the framework functions us DE.M-E-LEYPOLD.CL-TEST/TEST-SUITES::*SUITES* to
+;; translate selectors into a list of tests).
+;;
+;; In this case, though, in the tests of this package (see
+;; DE.M-E-LEYPOLD.CL-TEST/TESTS:DOCUMENTATION*) we force-reload this package repeatedly in
+;; DE.M-E-LEYPOLD.CL-TEST/TESTS:EXAMPLES-LOAD-PROPERLY. This will (at least under SBCL) lead to
+;; discovery of package variance (the in-system package export list is different from that
+;; given in defpackage) and ASDF seems to interprete the warning as an error (not so sure about
+;; the latter, though).
+;;
+;; Anyway: Explicitely exporting the symbol fixes the error from force-reloading with ASDF.
 
 (in-package :de.m-e-leypold.cl-test/example/assert-based)
 
