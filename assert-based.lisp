@@ -24,7 +24,7 @@
 (define-package :de.m-e-leypold.cl-test/assert-based
     "TODO assert-based"  
   (:export :define-test*)
-  (:import-from :de.m-e-leypold.cl-test/test-suites
+  (:import-from :de.m-e-leypold.cl-test/test-procedures
    :register-test))
 
 (in-package :de.m-e-leypold.cl-test/assert-based)

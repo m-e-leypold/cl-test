@@ -28,7 +28,7 @@
 
      TODO: Explain more, refer to other packages.
     "
-  (:export :register-test :with-new-suite-registry))
+  (:export :with-new-suite-registry))
 
 (in-package :de.m-e-leypold.cl-test/test-suites)
 
@@ -110,21 +110,3 @@
 (defun add-test (test-symbol suite)
   (pushnew test-symbol (slot-value suite 'suite-tests)))
 
-
-;; TODO RUN-SUITE, bind run-suite wrapper
-;; TODO get-suites (return symbol list, just for filtering?)
-
-;;; * Registering tests  ---------------------------------------------------------------------------
-
-  ;; TODO: Make accessible as global var.
-
-(defun register-test (symbol)
-  "
-  Register symbol in `TEST-SUITE', implicitely define SYMBOL-PACKAGE to be a test suite.
-"
-  (let ((package (symbol-package symbol)))
-    (assert (eq package *package*) nil
-	    (format t "*** (SYMBOL-PACKAGE '~S) = ~S is not *PACKAGE* = ~S when registering test"
-		    symbol package *package*))
-    (let ((suite (get-or-create-suite package)))
-      (add-test symbol suite))))

@@ -47,9 +47,10 @@
   :licence "GPL3"
   :description "CL-TEST common abstractions and utilities"
   :depends-on ("de.m-e-leypold.cl-test/loading-ramp")
-  :components ((:file "doctools")
+  :components ((:file "doctools")	     
 	       (:file "suites")
-	       (:file "test-suites")))
+	       (:file "test-suites")
+	       (:file "test-procedures")))
 
 (defsystem "de.m-e-leypold.cl-test/loading-ramp"
   :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"
