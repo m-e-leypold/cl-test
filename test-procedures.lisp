@@ -28,11 +28,20 @@
 
      TODO: Explain more, refer to other packages. No define-test, though.
     "
-  (:export :register-test)
+  (:export :register-test :get-tests :get-test-ids :do-tests)
   (:import-from :de.m-e-leypold.cl-test/test-suites
-   :get-or-create-suite :add-test))
+   :get-or-create-suite :add-test :get-suites))
 
 (in-package :de.m-e-leypold.cl-test/test-procedures)
+
+;;; * defclass TEST-DESCRIPTOR ---------------------------------------------------------------------
+
+(defclass test-descriptor ()
+  ((test-id
+    :reader test-id
+    :initarg :test-id
+    :initform (error "TEST-ID is required for TEST-DESCRIPTOR")
+    :documentation "ID of the test, a symbol")))
 
 ;;; * Test registration ----------------------------------------------------------------------------
 
@@ -44,8 +53,40 @@
     (assert (eq package *package*) nil
 	    (format t "*** (SYMBOL-PACKAGE '~S) = ~S is not *PACKAGE* = ~S when registering test"
 		    symbol package *package*))
+
+    (let ((test-descriptor (make-instance 'test-descriptor :test-id symbol)))
+      (setf (get symbol 'test-descriptor) test-descriptor))
+    
     (let ((suite (get-or-create-suite package)))
       (add-test symbol suite))))
+
+
+(defun get-test-descriptor (symbol)
+  (get symbol 'test-descriptor))
+
+;;; * Getting at the test list ---------------------------------------------------------------------
+
+(defun get-tests ()
+  (funcall #'concatenate 'cons
+	   (mapcar #'(lambda (suite)
+		       (mapcar #'(lambda (id) (get-test-descriptor id))
+			       (de.m-e-leypold.cl-test/test-suites:get-test-ids suite)))
+		   (get-suites))))
+
+
+;; TODO: Call this get-all-* etc to enable debugging with slime ?!
+
+
+(defun get-test-ids ()
+  "Returns a new list of all test ids in the order of the definitions of the respective tests."
+  (apply #'concatenate 'cons
+	   (mapcar #'(lambda (suite)
+		       (de.m-e-leypold.cl-test/test-suites:get-test-ids suite))
+		   (get-suites))))
+
+(defmacro do-tests ((test-var) &body body)
+  )
+
 
 
 ;; TODO: TEST-DESCRIPTOR (mostly as container for flags)

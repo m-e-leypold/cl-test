@@ -62,7 +62,7 @@
     :reader suite-id
     :initarg :suite-id
     :initform (error "SUITE-ID is required for TEST-SUITE")
-    :documentation "ID of a suite, a symbol from package :KEYWORD")
+    :documentation "ID of a suite, a symbol from package :KEYWORD") 
    (suite-symbol
     :type symbol
     :reader suite-symbol
