@@ -38,6 +38,9 @@
 
 (defmacro define-test*
     (name (&rest empty-lambda-list)  &body maybe-docstring+body)
+  (assert (not empty-lambda-list) nil
+	  (format nil "lambda list for DEFINE-TEST* must be emtpy, but is: ~S"
+		  empty-lambda-list))
   (let* ((maybe-docstring (car maybe-docstring+body))
 	 (body (cdr maybe-docstring+body))
 	 (docstring maybe-docstring))
