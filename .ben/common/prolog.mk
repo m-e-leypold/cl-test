@@ -33,5 +33,8 @@ full-check::
 .ONESHELL:
 export PS4 ==> 
 
-SET-SH := set -o pipefail; set -eux; 
+SET-SH := set -o pipefail; set -eux;
+
+cleaner:: clean
+	rm -rf .build
 
