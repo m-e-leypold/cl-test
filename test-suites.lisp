@@ -52,7 +52,7 @@
 
 (defmacro do-suites ((suite-var) &body body)
   `(progn
-     (dolist ((,suite-var (get-suites)))
+     (dolist (,suite-var (get-suites))
        ,@body)))
 
 
@@ -125,7 +125,29 @@
   (reverse (suite-tests suite)))
 
 (defmacro do-test-ids ((id-var suite) &body body)
-  `(dolist (,id-var (get-test-ids suite))
+  `(dolist (,id-var (get-test-ids ,suite))
      ,@body))
+
+
+(defgeneric get-suite (suite-designator)
+  (:documentation "
+   Get a `TEST-SUITE' object from a test suite designator.
+
+   A test suite designator might be:
+
+   - A keyword (as returned by `SUITE-ID'.
+   - A string.
+   - An instance of `TEST-SUITE'.
+   - A symbol to which the `TEST-SUITE' is bound, like the symbols automatically
+     generated in `*SUITES-PACKAGE*'.
+"))
+
+(defmethod get-suite ((suite-id symbol))
+  (if (eq (type-of suite-id) 'keyword)
+      (gethash suite-id *suite-instances*)
+      (let ((suite (gethash suite-id *suite-instances*)))
+	(assert (typep suite 'test-suite))
+	suite)))
+      
 
 ;; TODO: get-suite (from some signifier)

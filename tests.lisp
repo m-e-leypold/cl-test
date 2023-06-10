@@ -25,12 +25,15 @@
 (define-package :de.m-e-leypold.cl-test/tests
     "TODO: Tests"
   (:use :common-lisp :de.m-e-leypold.cl-test/assert-based)
+
   (:import-from :de.m-e-leypold.cl-test/test-suites
    :with-new-suite-registry
-   :get-suites :suite-id
-   )
+   :get-suites :do-suites :get-suite :do-test-ids :suite-id)
   (:import-from :de.m-e-leypold.cl-test/test-procedures
-   :get-test-ids :get-tests :test-id)
+   :get-test-ids :get-tests :test-id :do-tests)
+  (:import-from :de.m-e-leypold.cl-test/execution
+   :make-test-plan)
+  
   (:export
    :examples-load-properly))
 
@@ -139,4 +142,33 @@
 	
 	(let ((tests (get-tests)))
 	  (assert (equal (mapcar #'test-id tests)
-			 (list s1a s1b s2a s2b))))))))
+			 (list s1a s1b s2a s2b))))
+
+	(let ((suite (get-suite :de.m-e-leypold.cl-test/example/assert-based)))
+	  (let ((tests '()))
+	    (do-test-ids (test-id suite)
+	      (push test-id tests))
+	    (assert (equal tests (list s1b s1a)))))
+	
+	(let ((suites '()))
+	  (do-suites (suite)
+	    (push suite suites))
+	  (assert (equal suites
+			 (list
+			  (get-suite :de.m-e-leypold.cl-test/example/assert-based-2)
+			  (get-suite :de.m-e-leypold.cl-test/example/assert-based)))))
+
+
+	(let ((tests '()))
+	  (do-tests (test)
+	    (assert (typep test 'de.m-e-leypold.cl-test/test-procedures::test-descriptor))
+	    (push (test-id test) tests))
+	  (assert (equal tests (list s2b s2a s1b s1a))))
+	
+	;; TODO: The following fails :-(
+	
+	(assert (equal (make-test-plan)
+		       (list s1a s1b s2a s2b)))
+	))))
+
+

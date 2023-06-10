@@ -50,7 +50,8 @@
   :components ((:file "doctools")	     
 	       (:file "suites")
 	       (:file "test-suites")
-	       (:file "test-procedures")))
+	       (:file "test-procedures")
+	       (:file "execution")))
 
 (defsystem "de.m-e-leypold.cl-test/loading-ramp"
   :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"
