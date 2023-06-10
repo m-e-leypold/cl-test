@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -eu
+set -o pipefail
+
+LISP="${1? Need lisp implementation as first argument}"
+case "$LISP" in
+    sbcl)
+	USER_CACHE="$(sbcl --noinform --disable-debugger --eval '(format t "~A" asdf::*user-cache*)' --quit)";;
+    
+    *) echo >&2 "Unknown lisp implementation: $LISP."
+       exit 1
+       ;;
+esac
+
+echo "USER_CACHE = $USER_CACHE"
+
+if test -n "$USER_CACHE"; then
+   rm -rf "$USER_CACHE"
+fi
+	

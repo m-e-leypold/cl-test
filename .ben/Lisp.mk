@@ -62,9 +62,34 @@ check:: check-with-$(LISP-IMPLEMENTATION)
 
 endif
 
+
+# * Check for warnings (currently SBCL only) -----------------------------------
+
+LISP-IMPLEMENTATIONS-SUPPORTED-FOR-WARNINGS = sbcl
+
+ifeq ($(strip $(filter \
+        $(LISP-IMPLEMENTATION),$(LISP-IMPLEMENTATIONS-SUPPORTED-FOR-WARNINGS))),)
+check-warnings::
+else
+check-warnings:: check-warnings-$(LISP-IMPLEMENTATION)
+endif
+
+check-warnings-%::
+	: -- Checking for warnings with $* --
+	$(SET-SH)
+	$(BEN)/clear-user-cache $*
+	$(LISP-$*-LOAD-SYSTEM) "$(SYSTEM-NAME)/prerequisites"
+	mkdir -p .build
+	$(LISP-$*-LOAD-SYSTEM) "$(SYSTEM-NAME)/load" 2> .build/lisp-warnings
+	grep -A1 '; caught ' .build/lisp-warnings
+	test 0 -eq "$$(grep '; caught ' .build/lisp-warnings | wc -l)"
+	:
+
+check:: check-warnings
+
 # * Implementations  -----------------------------------------------------------
 
-# TODO: Technically the LISP-*-RUN-TEST should exist dependend on test status.
+# TODO: Technically the LISP-*-RUN-TEST should exit dependend on test status.
 #       But also when loading TEST-RUNNER we do not want to exit even on failure,
 #       at least not alway, when we're in slime.
 #
@@ -73,10 +98,28 @@ endif
 #       (possibility would be command line parameters or environment
 #       variable) if conditions alone do not suffice.
 
+# TODO: The interface from makefile to specific lisp implementations
+#       needs to be overhauled. It is much clearer now how that has to
+#       work:
+#
+#       Always call a driver script (eg sbcl-driver) to perform
+#       specific operations.
+#
+#       $ sbcl-driver load-system ...
+#       $ sbcl-driver clear-user-cache ...
+#       $ sbcl-driver parse-warnings
+
 # ** SBCL  ---------------------------------------------------------------------
 
 LISP-sbcl-RUN-TEST = \
 	sbcl --noinform --disable-debugger --load $(LISP-TEST-RUNNER) --quit
+
+LISP-sbcl-LOAD-SYSTEM = \
+        _load_system() { \
+	   sbcl --noinform --disable-debugger \
+                --eval "(asdf:operate 'asdf:load-op "'"'"$$1"'"'")" --quit ; };\
+        _load_system
+
 
 # ** ECL  ----------------------------------------------------------------------
 
