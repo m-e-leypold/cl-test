@@ -30,7 +30,7 @@
    :get-suites :suite-id
    )
   (:import-from :de.m-e-leypold.cl-test/test-procedures
-   :get-test-ids)
+   :get-test-ids :get-tests :test-id)
   (:export
    :examples-load-properly))
 
@@ -76,4 +76,8 @@
 			 '(:de.m-e-leypold.cl-test/example/assert-based
 			   :de.m-e-leypold.cl-test/example/assert-based-2))))
 
-	(assert (equal (get-test-ids) (list s1a s1b s2a s2b)))))))
+	(assert (equal (get-test-ids) (list s1a s1b s2a s2b)))
+
+	(let ((tests (get-tests)))	  
+	  (assert (equal (mapcar #'test-id tests)
+			 (list s1a s1b s2a s2b))))))))

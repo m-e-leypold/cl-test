@@ -28,7 +28,9 @@
 
      TODO: Explain more, refer to other packages.
     "
-  (:export :with-new-suite-registry :do-suites :get-suites :get-test-ids :suite-symbol :suite-id))
+  (:export :with-new-suite-registry :do-suites :get-suites
+   :get-test-ids :do-test-ids
+   :suite-symbol :suite-id))
 
 (in-package :de.m-e-leypold.cl-test/test-suites)
 
@@ -121,5 +123,9 @@
 
 (defun get-test-ids (suite)
   (reverse (suite-tests suite)))
+
+(defmacro do-test-ids ((id-var suite) &body body)
+  `(dolist (,id-var (get-test-ids suite))
+     ,@body))
 
 ;; TODO: get-suite (from some signifier)

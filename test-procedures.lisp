@@ -28,9 +28,14 @@
 
      TODO: Explain more, refer to other packages. No define-test, though.
     "
-  (:export :register-test :get-tests :get-test-ids :do-tests)
+
+  (:export
+   :register-test
+   :test-id
+   :get-tests :get-test-ids :do-tests :get-test-list)
+  
   (:import-from :de.m-e-leypold.cl-test/test-suites
-   :get-or-create-suite :add-test :get-suites))
+   :get-or-create-suite :add-test :get-suites :do-suites :do-test-ids))
 
 (in-package :de.m-e-leypold.cl-test/test-procedures)
 
@@ -67,11 +72,10 @@
 ;;; * Getting at the test list ---------------------------------------------------------------------
 
 (defun get-tests ()
-  (funcall #'concatenate 'cons
-	   (mapcar #'(lambda (suite)
-		       (mapcar #'(lambda (id) (get-test-descriptor id))
-			       (de.m-e-leypold.cl-test/test-suites:get-test-ids suite)))
-		   (get-suites))))
+  (mapcar #'get-test-descriptor
+	  (mapcan #'(lambda (suite)
+		      (de.m-e-leypold.cl-test/test-suites:get-test-ids suite))
+		  (get-suites))))
 
 
 ;; TODO: Call this get-all-* etc to enable debugging with slime ?!
@@ -85,12 +89,14 @@
 		   (get-suites))))
 
 (defmacro do-tests ((test-var) &body body)
-  )
+  (let ((suite-var (gensym "suite-var"))
+	(id-var (gensym "id-var")))
+    `(do-suites (,suite-var)
+       (do-test-ids (,id-var ,suite-var)
+	 (let ((,test-var (get-test-descriptor ,id-var)))
+	   ,@body)))))
 
-
+(defun get-test-list (&optional (sequence-type 'cons))
+  (map sequence-type #'get-test-descriptor  (get-test-ids)))
 
 ;; TODO: TEST-DESCRIPTOR (mostly as container for flags)
-;; TODO: get-suite (from some signifier)
-;; TODO: get-tests (null/:all) => gets us all tests
-;; TODO: do-tests (suite var ...)
-
