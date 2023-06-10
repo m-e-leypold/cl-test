@@ -38,23 +38,75 @@
 
 
 ;;; * Tests  ---------------------------------------------------------------------------------------
+;;; ** EXAMPLES-LOAD-PROPERLY  ---------------------------------------------------------------------
 
 (define-test* examples-load-properly ()
   "
   Try to load the examples. If this fails, we have a problem with the syntax macros.
 "
+
+  ;; Effects of loading :DE.M-E-LEYPOLD.CL-TEST/TESTS which already occured.
+  ;;
+  ;; We phrase this "openly", leaving the possibility that other test suites where also already
+  ;; loaded.
+
+  ;; (1) Package name as a keyword has been entered into
+  ;;     DE.M-E-LEYPOLD.CL-TEST/TEST-SUITES::*SUITES*
+  ;;
+  (assert (find :de.m-e-leypold.cl-test/tests de.m-e-leypold.cl-test/test-suites::*suites*))
+
+  ;; (2) Descriptor for test has been bound to a symbol (whose name is the package name) in
+  ;;     DE.M-E-LEYPOLD.CL-TEST/SUITES.
+  ;;
+  (assert (typep de.m-e-leypold.cl-test/suites::de.m-e-leypold.cl-test/tests
+		 'de.m-e-leypold.cl-test/test-suites::test-suite))
+
+  ;; (3) The descriptor has been stored in
+  ;;     DE.M-E-LEYPOLD.CL-TEST/TEST-SUITES::*SUITE-INSTANCES*
+  ;;
+  (assert (equal de.m-e-leypold.cl-test/suites::de.m-e-leypold.cl-test/tests
+		 (gethash :de.m-e-leypold.cl-test/tests
+		  de.m-e-leypold.cl-test/test-suites::*suite-instances*)))
+
+  ;; (4) DE.M-E-LEYPOLD.CL-TEST/TEST-SUITES::*SUITES-PACKAGE* points to package
+  ;;     :de.m-e-leypold.cl-test/suites. This is the package where automatic symbols for test
+  ;;     suites will be created.
+  ;;
+  (assert (equal de.m-e-leypold.cl-test/test-suites::*suites-package*
+		 (find-package :de.m-e-leypold.cl-test/suites)))
+
+
+  ;; We start be establishing a new registry context. This possibility exists solely for the
+  ;; purpose of checking the test definition and loading: I don't see ATN any value in using
+  ;; this in any day to day operation.
+
   (with-new-suite-registry ()
-    ;; TODO: Make this into a special assert "assert-asdf-loads"?
+
+    ;; To avoid difficult to understand error downstream, we check if a new context has been
+    ;; esatablished. Also count this as a basic test of with-new-suite-registry.
+
+    (assert (equal nil de.m-e-leypold.cl-test/test-suites::*suites*))
+    (assert (equal 0 (hash-table-count de.m-e-leypold.cl-test/test-suites::*suite-instances*)))
+    (assert (equal nil de.m-e-leypold.cl-test/test-suites::*suites-package*))
+
+
+    ;; Then we force-load the example suites via ASDF.
+    
     (asdf:operate 'asdf:load-op "de.m-e-leypold.cl-test/examples" :force T)
 
     (let ((p1 (find-package :de.m-e-leypold.cl-test/example/assert-based))
 	  (p2 (find-package :de.m-e-leypold.cl-test/example/assert-based-2)))
 
+      ;; The example suites (which are packages) could have been loaded before, but now they
+      ;; MUST have been loaded.
+      
       (assert p1)  ;; packages are now loaded
       (assert p2)
 
-      ;; cannot write the symbols verbatimely since the examples are (intentionally) not loaded
+      ;; Cannot write the symbols verbatimely since the examples are (intentionally) not loaded
       ;; at read time.
+      ;;
+      ;; This is a special quirk of this test where we dynamically load a system.
 
       (let ((s1a (find-symbol "A-TEST-THAT-WILL-FAIL" p1))
 	    (s1b (find-symbol "A-TEST-THAT-WILL-PASS" p1))
@@ -66,18 +118,25 @@
 	(assert s2a)
 	(assert s2b)
 
-
+	;; Suites registered properly?
+	
 	(assert (equal de.m-e-leypold.cl-test/test-suites::*suites*
 		       '(:de.m-e-leypold.cl-test/example/assert-based-2
 			 :de.m-e-leypold.cl-test/example/assert-based)))
 
+	;; Suites have the proper IDs?
+	
 	(let ((suites (get-suites)))
 	  (assert (equal (mapcar #'suite-id suites)
 			 '(:de.m-e-leypold.cl-test/example/assert-based
 			   :de.m-e-leypold.cl-test/example/assert-based-2))))
 
+	;; Does GET-TEST-IDs return the ids in order of their definition?
+	
 	(assert (equal (get-test-ids) (list s1a s1b s2a s2b)))
 
-	(let ((tests (get-tests)))	  
+	;; Does GET-TESTS return the proper test descriptors (in order of their definition)?
+	
+	(let ((tests (get-tests)))
 	  (assert (equal (mapcar #'test-id tests)
 			 (list s1a s1b s2a s2b))))))))
