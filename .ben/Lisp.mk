@@ -51,7 +51,7 @@ $(info LISP-TEST-RUNNER        = $(LISP-TEST-RUNNER))
 ifneq ($(strip $(LISP-TEST-RUNNER)),)
 
 check-with-%::
-	: Run tests written in lisp.
+	: -- Run tests written in lisp with $* --
 	$(SET-SH)
 	$(LISP-$*-RUN-TEST)
 	:
