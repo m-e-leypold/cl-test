@@ -56,6 +56,9 @@
        (export (quote ,name))
        (defun ,name ()
 	 ,docstring
+
+	 ;; TODO: Convert errors in TEST-FAILURE (subclass of)
+	 
 	 (progn
 	   ,@body
 	   ))

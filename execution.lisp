@@ -26,13 +26,37 @@
   
     "TODO: Explain execution."
 
-  (:export :make-test-plan)
+  (:export :make-test-plan :with-new-excution-state)
   
   (:import-from :de.m-e-leypold.cl-test/test-suites)
   (:import-from :de.m-e-leypold.cl-test/test-procedures
-   :do-tests :test-id))
+   :do-tests :test-id :continue))
 
 (in-package :de.m-e-leypold.cl-test/execution)
+
+
+;;; * Execution state  -----------------------------------------------------------------------------
+
+(defvar *test-plan* '())
+(defvar *tests-continuation* '())
+(defvar *tests-run* '())
+(defvar *passed* '())
+(defvar *failed* '())
+(defvar *errors* '())
+
+(defmacro with-new-execution-state (&body body)
+  `(let ((*test-plan* '())
+	 (*tests-continuation* '())
+	 (*tests-run* '())
+	 (*passed* '())
+	 (*failed* '())
+	 (*errors* '()))
+     ,@body))
+
+
+;;; * User parameters ------------------------------------------------------------------------------
+
+(defvar *force-debug* nil)
 
 ;;; * defun MAKE-TEST-PLAN -------------------------------------------------------------------------
 
@@ -42,3 +66,76 @@
       ;; Here we will select tests later
       (push test tests))
     (nreverse (mapcar #'test-id tests))))
+
+;;; * defun RUN-TESTS -----------------------------------------------------------------------------
+
+(defun get-results ()
+  (list
+   :passed *passed*
+   :failed *failed*
+   :total  *tests-run*
+   :errors *errors*
+   ))
+
+
+(defun count-as-test-error (test-symbol condition)
+  (format t "error => ~S, ~S~%" test-symbol condition)
+  (push (cons test-symbol condition) *errors*))
+
+
+(defun count-as-test-failed (test-symbol condition)
+
+  ;; TODO: Need to unpack real condition from some wrapper
+  ;;       conditions.
+  
+  (format t "failed => ~S, ~S~%" test-symbol condition)
+  (push (cons test-symbol condition) *failed*))
+
+
+(defun count-as-test-passed (test-symbol)
+  (format t "passed => ~S~%" test-symbol)
+  (push test-symbol *passed*))
+
+
+(defun run-tests (&key
+		    restart
+		    )
+  ;; TODO assert restart
+  (if (not restart)
+      (setf *test-plan* (make-test-plan)))
+  (if (not (eq restart :continue))
+      (progn (setf *tests-continuation* *test-plan*)
+	     (setf *tests-run* '())
+	     (setf *passed* '())
+	     (setf *failed* '())
+  	     (setf *errors* '())))
+
+
+  (do ()
+      ((not *tests-continuation*) (get-results))
+
+    (let ((test (car *tests-continuation*)))
+
+      (handler-bind
+	  ((error  #'(lambda (c)
+		       (progn 
+			 (count-as-test-error test c)
+			 (invoke-restart 'next-test))))
+
+	   ;; TODO: Handler for actual TEST-FAILURE (does not exist yet)
+	   )
+
+	
+	(do ((repeat t))
+	    ((not repeat))
+	  (restart-case
+	      (progn
+		(funcall test)
+		(setf repeat nil)
+		(count-as-test-passed test))
+	    (repeat () )
+	    (next-test () (setf repeat nil)))))
+
+      (pushnew test *tests-run*)
+      (setf *tests-continuation* (cdr *tests-continuation*)))))
+

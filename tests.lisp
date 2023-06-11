@@ -32,7 +32,7 @@
   (:import-from :de.m-e-leypold.cl-test/test-procedures
    :get-test-ids :get-tests :test-id :do-tests)
   (:import-from :de.m-e-leypold.cl-test/execution
-   :make-test-plan)
+   :make-test-plan :run-tests)
   
   (:export
    :examples-load-properly))
@@ -169,6 +169,11 @@
 	
 	(assert (equal (make-test-plan)
 		       (list s1a s1b s2a s2b)))
+
+	
+	(let ((results (run-tests)))
+	  (let ((*print-pretty* t))
+	    (format t "results => ~S~%" results)))
 	))))
 
 

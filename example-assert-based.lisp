@@ -47,6 +47,6 @@
 
 (define-test* a-test-that-will-pass ()
   "An assertion based test which will not fail"
-  (assert nil))
+  (assert t))
 
 
