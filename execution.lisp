@@ -43,6 +43,7 @@
 (defvar *passed* '())
 (defvar *failed* '())
 (defvar *errors* '())
+(defvar *current-test* '())
 
 (defmacro with-new-execution-state (&body body)
   `(let ((*test-plan* '())
@@ -50,7 +51,8 @@
 	 (*tests-run* '())
 	 (*passed* '())
 	 (*failed* '())
-	 (*errors* '()))
+	 (*errors* '())
+	 (*current-test* '()))
      ,@body))
 
 
@@ -97,10 +99,9 @@
   (push test-symbol *passed*))
 
 
-(defun run-tests (&key
-		    restart
-		    )
+(defun run-tests (&key restart)
   ;; TODO assert restart
+  (setf *current-test* nil)
   (if (not restart)
       (setf *test-plan* (make-test-plan)))
   (if (not (eq restart :continue))
@@ -109,19 +110,19 @@
 	     (setf *passed* '())
 	     (setf *failed* '())
   	     (setf *errors* '())))
-
-
+  
+  
   (do ()
       ((not *tests-continuation*) (get-results))
-
-    (let ((test (car *tests-continuation*)))
-
+    
+    (let* ((*current-test* (car *tests-continuation*)))
+	   
       (handler-bind
 	  ((error  #'(lambda (c)
 		       (progn 
-			 (count-as-test-error test c)
+			 (count-as-test-error *current-test* c)
 			 (invoke-restart 'next-test))))
-
+	   
 	   ;; TODO: Handler for actual TEST-FAILURE (does not exist yet)
 	   )
 
@@ -130,12 +131,12 @@
 	    ((not repeat))
 	  (restart-case
 	      (progn
-		(funcall test)
+		(funcall *current-test*)
 		(setf repeat nil)
-		(count-as-test-passed test))
+		(count-as-test-passed *current-test*))
 	    (repeat () )
 	    (next-test () (setf repeat nil)))))
-
-      (pushnew test *tests-run*)
+	
+      (pushnew *current-test* *tests-run*)
       (setf *tests-continuation* (cdr *tests-continuation*)))))
 
