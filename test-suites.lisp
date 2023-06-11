@@ -28,9 +28,11 @@
 
      TODO: Explain more, refer to other packages.
     "
-  (:export :with-new-suite-registry :do-suites :get-suites
+  (:export
+   :with-new-suite-registry :do-suites :get-suites
    :get-test-ids :do-test-ids
-   :suite-symbol :suite-id))
+   :suite-symbol :suite-id
+   :devar-suite-symbol))
 
 (in-package :de.m-e-leypold.cl-test/test-suites)
 
@@ -55,6 +57,14 @@
      (dolist (,suite-var (get-suites))
        ,@body)))
 
+(defun defvar-suite-symbol (symbol)  
+  (if *suites-package*
+      (let* ((package (symbol-package symbol))
+	     (package-name (package-name package))
+	     (package-symbol (intern package-name *suites-package*)))
+	`(defvar ,package-symbol nil))
+      nil))
+	
 
 ;;; * defclass TEST-SUITE  -------------------------------------------------------------------------
 
@@ -101,7 +111,7 @@
 
 	    (if package-symbol
 		(progn
-		  (proclaim `(special ,package-symbol))	   
+		  ;; (proclaim `(special ,package-symbol))	   
 		  (export (list package-symbol) *suites-package*)))
 	    
 	    #+nil (format t "Registering: ~S~%" package-symbol) ; TODO: Need a logging package

@@ -24,8 +24,11 @@
 (define-package :de.m-e-leypold.cl-test/assert-based
     "TODO assert-based"  
   (:export :define-test*)
+  (:import-from :de.m-e-leypold.cl-test/test-suites
+   :defvar-suite-symbol)
   (:import-from :de.m-e-leypold.cl-test/test-procedures
-   :register-test))
+   :register-test))		
+
 
 (in-package :de.m-e-leypold.cl-test/assert-based)
 
@@ -49,6 +52,7 @@
 	  (setf docstring nil)
 	  (setf body maybe-docstring+body)))
     `(progn
+       ,(defvar-suite-symbol name)
        (export (quote ,name))
        (defun ,name ()
 	 ,docstring
