@@ -47,7 +47,8 @@
   :licence "GPL3"
   :description "CL-TEST common abstractions and utilities"
   :depends-on ("de.m-e-leypold.cl-test/loading-ramp")
-  :components ((:file "doctools")	     
+  :components ((:file "doctools")
+	       (:file "conditions")
 	       (:file "suites")
 	       (:file "test-suites")
 	       (:file "test-procedures")

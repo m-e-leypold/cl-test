@@ -64,7 +64,5 @@
 	   ))
        (register-test (quote ,name)))))
 
-;;; TODO: Register package as suite
-;;; TODO: Automatically export
 ;;; TODO: Abstract body parsing into parse-function-body and with-parsed-function-body
 ;;; TODO: Convert escaping conditions to test failures
