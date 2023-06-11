@@ -81,7 +81,7 @@ check-warnings-%::
 	$(LISP-$*-LOAD-SYSTEM) "$(SYSTEM-NAME)/prerequisites"
 	mkdir -p .build
 	$(LISP-$*-LOAD-SYSTEM) "$(SYSTEM-NAME)/load" 2> .build/lisp-warnings
-	grep -A1 '; caught ' .build/lisp-warnings
+	grep -A1 '; caught ' .build/lisp-warnings || true
 	test 0 -eq "$$(grep '; caught ' .build/lisp-warnings | wc -l)"
 	:
 
