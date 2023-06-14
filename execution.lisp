@@ -83,46 +83,37 @@
    ))
 
 
-(defun log-test-as-error (test-symbol condition)
-  (format t "error => ~S, ~S~%" test-symbol condition)
-  (push (cons test-symbol condition) *errors*))
+(defun log-test-result (test-symbol result result-origin &rest more-info)
+  (format t "~&~A => ~S (~S): ~S~%" result test-symbol result-origin more-info)
 
-
-(defun log-test-as-failed (test-symbol condition)
-
-  ;; TODO: Need to unpack real condition from some wrapper
-  ;;       conditions.
-
-  (format t "failed => ~S, ~S~%" test-symbol condition)
-  (push (cons test-symbol condition) *failed*))
-
-(defun log-test-as-skipped (test-symbol reason)
-
-  ;; TODO: Need to unpack real condition from some wrapper
-  ;;       conditions.
-
-  (format t "skipped => ~S, ~S~%" test-symbol reason)
-  (push (cons test-symbol reason) *skipped*))
-
-
-(defun log-test-as-passed (test-symbol)
-  (format t "passed => ~S~%" test-symbol)
-  (push test-symbol *passed*))
+  ;; TODO: We should print better errors ...
+  ;; TODO: If origin :manually ...
+  
+  (ecase result
+    (:passed
+     (push test-symbol *passed*))
+    (:failed
+     (push (cons test-symbol (cons result-origin more-info)) *failed*))
+    (:skipped
+     (push (cons test-symbol (cons result-origin more-info)) *skipped*))
+    (:error
+     (push (cons test-symbol (cons result-origin more-info)) *errors*))))
 
 
 (defun run-tests (&key restart debug)
+
   (setf *current-test* nil)
+
   (if (not restart)
       (setf *test-plan* (make-test-plan)))
+  
   (if (not (eq restart :continue))
       (progn (setf *tests-continuation* *test-plan*)
 	     (setf *tests-run* '())
 	     (setf *passed* '())
 	     (setf *failed* '())
   	     (setf *errors* '())))
-
-
-
+  
   (do ()
       ((not *tests-continuation*) (get-results))
 
@@ -143,32 +134,30 @@
 	  (let ((current-condition nil))
 	    (restart-case
 		(handler-bind
+		    
 		    ((condition #'(lambda (c) (setf current-condition c))))
 
 		  (funcall *current-test*)
 		  (setf repeat nil)
-		  (log-test-as-passed *current-test*))
-
+		  (log-test-result *current-test* :passed :run-test))
+	      
 	      (repeat () )
 	      
 	      (skip (&optional (origin :manually) reason)
 		(setf repeat nil)
-		(log-test-as-skipped *current-test* (cons origin (or reason current-condition))))
+		(log-test-result *current-test* :skipped origin (or reason current-condition)))
 	      
-	      (log-error ()
+	      (log-error (&optional (origin :manually) reason)
 		(setf repeat nil)
-		(log-test-as-error *current-test* current-condition))
+		(log-test-result *current-test* :error origin (or reason current-condition)))
 
-	      (log-failure ()
+	      (log-failure (&optional (origin :manually) reason)
 		(setf repeat nil)
-		(log-test-as-failed *current-test* current-condition))
-	      
+		(log-test-result *current-test* :failed origin (or reason current-condition)))
 	    ))))
 
       (pushnew *current-test* *tests-run*)
       (setf *tests-continuation* (cdr *tests-continuation*)))))
-
-
 
 ;; TODO: Better readable restarts
 
