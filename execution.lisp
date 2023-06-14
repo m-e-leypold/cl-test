@@ -78,17 +78,20 @@
    :passed  *passed*
    :failed  *failed*
    :errors  *errors*
-   :skipped *skipped*   
+   :skipped *skipped*
    :total   *tests-run*
    ))
 
 
 (defun log-test-result (test-symbol result result-origin &rest more-info)
-  (format t "~&~A => ~S (~S): ~S~%" result test-symbol result-origin more-info)
+  (format t "~&~A (~S) => ~S: ~S~%" result result-origin test-symbol more-info)
 
-  ;; TODO: We should print better errors ...
+  ;; TODO: We should print better errors...
+  ;;       - convert more-info to s.th. readable.
+  ;;       - Generalized "logging" instead of plain format (logging subsystem?)
+  ;;
   ;; TODO: If origin :manually ...
-  
+
   (ecase result
     (:passed
      (push test-symbol *passed*))
@@ -106,14 +109,14 @@
 
   (if (not restart)
       (setf *test-plan* (make-test-plan)))
-  
+
   (if (not (eq restart :continue))
       (progn (setf *tests-continuation* *test-plan*)
 	     (setf *tests-run* '())
 	     (setf *passed* '())
 	     (setf *failed* '())
   	     (setf *errors* '())))
-  
+
   (do ()
       ((not *tests-continuation*) (get-results))
 
@@ -124,7 +127,7 @@
 	  ((error  #'(lambda (c)
 		       (declare (ignore c))
 		       (if (not *force-debug*)
-			   (invoke-restart 'log-error))))
+			   (invoke-restart 'log-error :run-test))))
 
 	   ;; TODO: Handler for actual TEST-FAILURE (does not exist yet)
 	   )
@@ -134,19 +137,19 @@
 	  (let ((current-condition nil))
 	    (restart-case
 		(handler-bind
-		    
+
 		    ((condition #'(lambda (c) (setf current-condition c))))
 
 		  (funcall *current-test*)
 		  (setf repeat nil)
 		  (log-test-result *current-test* :passed :run-test))
-	      
+
 	      (repeat () )
-	      
+
 	      (skip (&optional (origin :manually) reason)
 		(setf repeat nil)
 		(log-test-result *current-test* :skipped origin (or reason current-condition)))
-	      
+
 	      (log-error (&optional (origin :manually) reason)
 		(setf repeat nil)
 		(log-test-result *current-test* :error origin (or reason current-condition)))
