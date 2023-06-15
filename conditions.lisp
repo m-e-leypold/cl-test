@@ -22,17 +22,63 @@
 ;;; * Package definition  --------------------------------------------------------------------------
 
 (define-package :de.m-e-leypold.cl-test/conditions
-    "TODO conditions"  
-  (:export :test-failure :test-failure-by-error))
+    "TODO conditions
+
+     TODO: Convention tests signal conditions, perhaps converted
+     TODO: With *FORCE-DEBUG* no conversion will take place
+
+     When something fails when executing a test (which means it probably needs to abort
+     immediately), conditions are signalled:
+
+     - `FAILED-CHECK' :: A check (the assertion of some predicate on testee output or state)
+       failed.
+
+     - `TEST-ERROR' :: TODO
+
+     - `SKIP-REQUEST' :: TODO
+
+     The actual policy in force at any given moment is left to signal handlers established
+     earlier on the call stack. For example `DE.M-E-LEYPOLD.CL-TEST/EXECUTION::RUN-TESTS'
+     establishes such signal handlers. The options provided to the policies are restablished by
+     restarts wrapped around the test procedures and around check macros (like EXPECT [not yet
+     available]).
+
+     To facilitate differentiated handling, the conditions are structured as a class hierarchy:
+
+     ```classdiagram
+
+        test-condition
+
+        test-failure      --|> test-condition
+        test-error        --|> test-failure
+        failed-check      --|> test-failure
+
+        skip-request      --|> test-condition
+     ```
+"  
+  (:export :test-condition :test-failure :failed-check :test-error
+	   :skip-test :skip-request))
 
 (in-package :de.m-e-leypold.cl-test/conditions)
 
-(define-condition test-failure ()
+(define-condition test-condition ()
   ())
 
-(define-condition test-failure-by-error (test-failure)
+(define-condition test-failure (test-condition)
   ())
 
+(define-condition test-error (test-failure)
+  ())
 
-    
+(define-condition failed-check (test-failure)
+  ())
 
+(define-condition skip-request (test-failure)
+  ((cause
+    :reader cause
+    :initarg :cause
+    :documentation "Why the test must be skipped"
+    )))
+
+(defun skip-test (&optional cause)
+  (signal 'skip-request :cause cause))

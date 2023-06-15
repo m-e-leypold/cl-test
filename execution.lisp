@@ -26,7 +26,7 @@
 
     "TODO: Explain execution."
 
-  (:export :make-test-plan :with-new-excution-state)
+  (:export :run-tests :make-test-plan :with-new-excution-state)
 
   (:import-from :de.m-e-leypold.cl-test/test-suites)
   (:import-from :de.m-e-leypold.cl-test/test-procedures
