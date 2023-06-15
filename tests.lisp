@@ -113,11 +113,13 @@
 
       (let ((s1a (find-symbol "A-TEST-THAT-WILL-FAIL" p1))
 	    (s1b (find-symbol "A-TEST-THAT-WILL-PASS" p1))
+	    (s1c (find-symbol "A-TEST-THAT-WILL-BE-SKIPPED" p1))
 	    (s2a (find-symbol "A-TEST-THAT-WILL-FAIL" p2))
 	    (s2b (find-symbol "A-TEST-THAT-WILL-PASS" p2)))
 
 	(assert s1a)
 	(assert s1b)
+	(assert s1c)
 	(assert s2a)
 	(assert s2b)
 
@@ -136,19 +138,19 @@
 
 	;; Does GET-TEST-IDs return the ids in order of their definition?
 	
-	(assert (equal (get-test-ids) (list s1a s1b s2a s2b)))
+	(assert (equal (get-test-ids) (list s1a s1b s1c s2a s2b)))
 
 	;; Does GET-TESTS return the proper test descriptors (in order of their definition)?
 	
 	(let ((tests (get-tests)))
 	  (assert (equal (mapcar #'test-id tests)
-			 (list s1a s1b s2a s2b))))
+			 (list s1a s1b s1c s2a s2b))))
 
 	(let ((suite (get-suite :de.m-e-leypold.cl-test/example/assert-based)))
 	  (let ((tests '()))
 	    (do-test-ids (test-id suite)
 	      (push test-id tests))
-	    (assert (equal tests (list s1b s1a)))))
+	    (assert (equal tests (list s1c s1b s1a)))))
 	
 	(let ((suites '()))
 	  (do-suites (suite)
@@ -163,12 +165,10 @@
 	  (do-tests (test)
 	    (assert (typep test 'de.m-e-leypold.cl-test/test-procedures::test-descriptor))
 	    (push (test-id test) tests))
-	  (assert (equal tests (list s2b s2a s1b s1a))))
-	
-	;; TODO: The following fails :-(
+	  (assert (equal tests (list s2b s2a s1c s1b s1a))))
 	
 	(assert (equal (make-test-plan)
-		       (list s1a s1b s2a s2b)))
+		       (list s1a s1b s1c s2a s2b)))
 
 	
 	(let ((results (run-tests)))

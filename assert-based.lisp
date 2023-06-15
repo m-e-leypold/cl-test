@@ -23,11 +23,13 @@
 
 (define-package :de.m-e-leypold.cl-test/assert-based
     "TODO assert-based"  
-  (:export :define-test*)
+  (:export :define-test* :skip-test)
   (:import-from :de.m-e-leypold.cl-test/test-suites
    :defvar-suite-symbol)
   (:import-from :de.m-e-leypold.cl-test/test-procedures
-   :register-test))		
+   :register-test)
+  (:import-from :de.m-e-leypold.cl-test/conditions
+   :skip-test))		
 
 
 (in-package :de.m-e-leypold.cl-test/assert-based)

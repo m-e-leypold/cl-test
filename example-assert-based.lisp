@@ -23,7 +23,8 @@
   (:use :common-lisp :de.m-e-leypold.cl-test/assert-based)
   (:export
    :a-test-that-will-fail
-   :a-test-that-will-pass))
+   :a-test-that-will-pass
+   :a-test-that-will-be-skipped))
 
 ;; Note regarding (:export :test-a): Normally you do not *need* to export the tests, this is
 ;; done automatically and running a test with the framework function doesn't need the symbol
@@ -48,5 +49,9 @@
 (define-test* a-test-that-will-pass ()
   "An assertion based test which will not fail"
   (assert t))
+
+(define-test* a-test-that-will-be-skipped ()
+  "An assertion based test tht will be skipped"
+  (skip-test "Just to demonstrate test skipping"))
 
 
