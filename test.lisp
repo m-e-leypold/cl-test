@@ -23,8 +23,9 @@
 
 ;; For the moment: Run the test(s) explicitely as procedures
 
+(de.m-e-leypold.cl-test/tests:check-split-docstring+options+body)
 (de.m-e-leypold.cl-test/tests:examples-load-properly)
-(de.m-e-leypold.cl-test/tests:examples-load-properly)
+
 
 
 

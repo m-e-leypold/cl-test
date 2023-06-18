@@ -48,6 +48,7 @@
   :description "CL-TEST common abstractions and utilities"
   :depends-on ("de.m-e-leypold.cl-test/loading-ramp")
   :components ((:file "doctools")
+	       (:file "macro-tools")	       
 	       (:file "conditions")
 	       (:file "suites")
 	       (:file "test-suites")

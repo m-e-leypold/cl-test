@@ -33,6 +33,9 @@
    :get-test-ids :get-tests :test-id :do-tests)
   (:import-from :de.m-e-leypold.cl-test/execution
    :make-test-plan :run-tests)
+
+  (:import-from :de.m-e-leypold.cl-test/macro-tools
+   :split-docstring+options+body)
   
   (:export
    :examples-load-properly))
@@ -41,13 +44,111 @@
 
 
 ;;; * Tests  ---------------------------------------------------------------------------------------
+
+;;; ** CHECK-SPLIT-DOCSTRING+OPTIONS+BODY  ---------------------------------------------------------
+
+(define-test* check-split-docstring+options+body ()
+
+  "This test checks if various permutations of calling `SPLIT-DOCSTRING+OPTIONS+BODY' actually work."
+  
+  (multiple-value-bind (body docstring options)
+      (split-docstring+options+body
+       '("a docstring"
+	 (:opt1 1 2 3)
+	 (:opt2 4)
+	 (and a body form)
+	 (and another form)))
+
+    (assert (equal body
+		   '((and a body form)
+		     (and another form))))
+
+    (assert (equal options
+		   '((:opt1 1 2 3)
+		     (:opt2 4))))
+
+    (assert (equal docstring "a docstring")))
+
+  (multiple-value-bind (body docstring options)
+      (split-docstring+options+body
+       '((:opt1 1 2 3)
+	 (:opt2 4)
+	 (and a body form)
+	 (and another form)))
+
+    (assert (equal body
+		   '((and a body form)
+		     (and another form))))
+
+    (assert (equal options
+		   '((:opt1 1 2 3)
+		     (:opt2 4))))
+
+    (assert (equal docstring nil)))
+
+  (multiple-value-bind (body docstring options)
+      (split-docstring+options+body
+       '((:opt2 4)
+	 (and a body form)
+	 (and another form)))
+
+    (assert (equal body
+		   '((and a body form)
+		     (and another form))))
+
+    (assert (equal options
+		   '((:opt2 4))))
+
+    (assert (equal docstring nil)))
+
+  
+  (multiple-value-bind (body docstring options)
+      (split-docstring+options+body
+       '((and a body form)
+	 (and another form)))
+
+    (assert (equal body
+		   '((and a body form)
+		     (and another form))))
+
+    (assert (equal options nil))
+    (assert (equal docstring nil)))
+
+  (multiple-value-bind (body docstring options)
+      (split-docstring+options+body
+       '("a docstring"
+	 (and a body form)
+	 (and another form)))
+    
+    (assert (equal body
+		   '((and a body form)
+		     (and another form))))
+      
+    (assert (equal options nil))
+    (assert (equal docstring "a docstring")))
+
+  (multiple-value-bind (body docstring options)
+      (split-docstring+options+body
+       '("a docstring"))
+    
+    (assert (equal body '(progn )))
+    (assert (equal options nil))
+    (assert (equal docstring "a docstring")))
+
+  (multiple-value-bind (body docstring options)
+      (split-docstring+options+body
+       '())
+    
+    (assert (equal body '(progn )))
+    (assert (equal options nil))
+    (assert (equal docstring nil))))
+
 ;;; ** EXAMPLES-LOAD-PROPERLY  ---------------------------------------------------------------------
 
 (define-test* examples-load-properly ()
   "
   Try to load the examples. If this fails, we have a problem with the syntax macros.
-"
-
+"   
   ;; Effects of loading :DE.M-E-LEYPOLD.CL-TEST/TESTS which already occured.
   ;;
   ;; We phrase this "openly", leaving the possibility that other test suites where also already
