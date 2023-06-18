@@ -30,9 +30,9 @@
    :register-test)
   (:import-from :de.m-e-leypold.cl-test/execution
    :*force-debug*)
-  (:use :de.m-e-leypold.cl-test/conditions))
-
-
+  (:use
+   :de.m-e-leypold.cl-test/conditions
+   :de.m-e-leypold.cl-test/macro-tools))
 
 (in-package :de.m-e-leypold.cl-test/assert-based)
 
@@ -46,18 +46,15 @@
 (define-condition failed-assertion (failed-check)
   ())
 
-(defmacro define-test*
-    (name (&rest empty-lambda-list)  &body maybe-docstring+body)
+(defmacro define-test* (name (&rest empty-lambda-list)  &body maybe-docstring+body)
+
   (assert (not empty-lambda-list) nil
 	  (format nil "lambda list for DEFINE-TEST* must be emtpy, but is: ~S"
 		  empty-lambda-list))
-  (let* ((maybe-docstring (car maybe-docstring+body))
-	 (body (cdr maybe-docstring+body))
-	 (docstring maybe-docstring))
-    (if (not (and (typep maybe-docstring 'string) body))
-	(progn
-	  (setf docstring nil)
-	  (setf body maybe-docstring+body)))
+
+  (multiple-value-bind (body docstring options)
+      (split-docstring+options+body maybe-docstring+body)
+
     `(progn
        ,(defvar-suite-symbol name)
        (export (quote ,name))    ; TODO: Change: Do not export automatically.
