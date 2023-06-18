@@ -38,6 +38,7 @@
    :split-docstring+options+body)
   
   (:export
+   :check-split-docstring+options+body
    :examples-load-properly))
 
 (in-package :de.m-e-leypold.cl-test/tests)
@@ -57,7 +58,8 @@
 	 (:opt1 1 2 3)
 	 (:opt2 4)
 	 (and a body form)
-	 (and another form)))
+	 (and another form))
+       :allowed-tags '(:opt1 :opt2))
 
     (assert (equal body
 		   '((and a body form)
@@ -74,7 +76,8 @@
        '((:opt1 1 2 3)
 	 (:opt2 4)
 	 (and a body form)
-	 (and another form)))
+	 (and another form))
+       :allowed-tags '(:opt1 :opt2))
 
     (assert (equal body
 		   '((and a body form)
@@ -90,7 +93,8 @@
       (split-docstring+options+body
        '((:opt2 4)
 	 (and a body form)
-	 (and another form)))
+	 (and another form))
+       :allowed-tags '(:opt1 :opt2))
 
     (assert (equal body
 		   '((and a body form)
@@ -105,7 +109,8 @@
   (multiple-value-bind (body docstring options)
       (split-docstring+options+body
        '((and a body form)
-	 (and another form)))
+	 (and another form))
+       :allowed-tags '(:opt1 :opt2))
 
     (assert (equal body
 		   '((and a body form)
@@ -118,7 +123,8 @@
       (split-docstring+options+body
        '("a docstring"
 	 (and a body form)
-	 (and another form)))
+	 (and another form))
+       :allowed-tags '(:opt1 :opt2))
     
     (assert (equal body
 		   '((and a body form)
@@ -129,7 +135,8 @@
 
   (multiple-value-bind (body docstring options)
       (split-docstring+options+body
-       '("a docstring"))
+       '("a docstring")
+       :allowed-tags '(:opt1 :opt2))
     
     (assert (equal body '(progn )))
     (assert (equal options nil))
@@ -137,7 +144,8 @@
 
   (multiple-value-bind (body docstring options)
       (split-docstring+options+body
-       '())
+       '()
+       :allowed-tags '(:opt1 :opt2))
     
     (assert (equal body '(progn )))
     (assert (equal options nil))

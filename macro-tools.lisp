@@ -27,7 +27,9 @@
 
   (:export
    :package-documentation
-   :define-package-documentation-anchor))
+   :define-package-documentation-anchor
+   :split-docstring+options+body
+   ))
       
 (in-package :de.m-e-leypold.cl-test/macro-tools)
 
@@ -36,7 +38,7 @@
 (defmacro trace-var (var)
   `(format t "~A => ~S~%" (quote ,var) ,var))
 
-(defun split-docstring+options+body (forms &key no-options no-docstring)
+(defun split-docstring+options+body (forms &key no-docstring allowed-tags)
   (let ((docstring nil)
 	(options nil)
 	(body forms))
@@ -56,8 +58,14 @@
 	 (if no-docstring
 	     (assert (not docstring) nil "This body cannot have a docstring"))
 
-	 (if no-options
-	     (assert (not options) nil "This body cannot have options"))
+	 (if (not allowed-tags)
+	     (assert (not options) nil "This body cannot have options")
+	     (if (not (eq allowed-tags :all))
+		 (dolist (option options)
+		   (let ((tag (car option)))
+		     (assert (find tag allowed-tags) nil "Tag ~A not allowed here")))))
+
+	   
 	 
 	 (values
 	  (if body body '(progn )) ;; avoid empty body FTM
