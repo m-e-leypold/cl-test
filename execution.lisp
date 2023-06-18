@@ -27,7 +27,7 @@
     "TODO: Explain execution."
 
   (:export :run-tests :make-test-plan :with-new-excution-state)
-
+  (:use :de.m-e-leypold.cl-test/conditions)
   (:import-from :de.m-e-leypold.cl-test/test-suites)
   (:import-from :de.m-e-leypold.cl-test/test-procedures
    :do-tests :test-id :continue))
@@ -84,7 +84,7 @@
 
 
 (defun log-test-result (test-symbol result result-origin &rest more-info)
-  (format t "~&~A (~S) => ~S: ~S~%" result result-origin test-symbol more-info)
+  (format t "~&~A (~S) => ~S: ~A~%" result result-origin test-symbol more-info)
 
   ;; TODO: We should print better errors...
   ;;       - convert more-info to s.th. readable.
@@ -124,13 +124,25 @@
 	   (*force-debug* (or debug *force-debug*)))
 
       (handler-bind
-	  ((error  #'(lambda (c)
+
+	  ((skip-request  #'(lambda (c)
+			      (declare (ignore c))
+			      (invoke-restart 'skip :run-test)))
+
+	   (failed-check  #'(lambda (c)
+			      (declare (ignore c))
+			      (if (not *force-debug*)
+				  (invoke-restart 'log-failure :run-test))))
+
+	   (test-error  #'(lambda (c)
+			    (declare (ignore c))
+			    (if (not *force-debug*)
+				(invoke-restart 'log-error :run-test))))
+
+	   (error  #'(lambda (c)
 		       (declare (ignore c))
 		       (if (not *force-debug*)
-			   (invoke-restart 'log-error :run-test))))
-
-	   ;; TODO: Handler for actual TEST-FAILURE (does not exist yet)
-	   )
+			   (invoke-restart 'log-error :run-test)))))
 
 	(do ((repeat t))
 	    ((not repeat))
@@ -143,7 +155,6 @@
 		  (funcall *current-test*)
 		  (setf repeat nil)
 		  (log-test-result *current-test* :passed :run-test))
-
 	      (repeat () )
 
 	      (skip (&optional (origin :manually) reason)
@@ -153,6 +164,8 @@
 	      (log-error (&optional (origin :manually) reason)
 		(setf repeat nil)
 		(log-test-result *current-test* :error origin (or reason current-condition)))
+
+	      ;; Better name for log-failure: Fail-test
 
 	      (log-failure (&optional (origin :manually) reason)
 		(setf repeat nil)

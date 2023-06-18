@@ -61,24 +61,28 @@
 
 (in-package :de.m-e-leypold.cl-test/conditions)
 
+;;; * Conditions -----------------------------------------------------------------------------------
+
 (define-condition test-condition ()
   ())
 
-(define-condition test-failure (test-condition)
+(define-condition test-failure (test-condition error)
   ())
 
 (define-condition test-error (test-failure)
-  ())
+  ((cause
+    :reader cause
+    :initarg :cause
+    :documentation "Why the test has an error")))
 
 (define-condition failed-check (test-failure)
   ())
 
-(define-condition skip-request (test-failure)
+(define-condition skip-request (test-condition)
   ((cause
     :reader cause
     :initarg :cause
-    :documentation "Why the test must be skipped"
-    )))
+    :documentation "Why the test must be skipped")))
 
 (defun skip-test (&optional cause)
-  (signal 'skip-request :cause cause))
+  (error 'skip-request :cause cause))

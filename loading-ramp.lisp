@@ -33,7 +33,7 @@
        (:documentation ,doc-string)
        ,@body
        (:use :common-lisp) 
-       (:export :*documentation*))
+       #+nil (:export :*documentation*))
      (in-package ,name)
      (define-package-documentation-anchor "*DOCUMENTATION*")))
 
