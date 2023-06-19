@@ -1,17 +1,17 @@
 ;;;
 ;;;  cl-test -- another test framework for common lisp.
 ;;;  Copyright (C) 2022  M E Leypold
-;;;  
+;;;
 ;;;  This program is free software: you can redistribute it and/or modify
 ;;;  it under the terms of the GNU General Public License as published by
 ;;;  the Free Software Foundation, either version 3 of the License, or
 ;;;  (at your option) any later version.
-;;;  
+;;;
 ;;;  This program is distributed in the hope that it will be useful,
 ;;;  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;  GNU General Public License for more details.
-;;;  
+;;;
 ;;;  You should have received a copy of the GNU General Public License
 ;;;  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ;;;
@@ -23,7 +23,7 @@
 ;;; * Package definition  --------------------------------------------------------------------------
 
 (define-package :de.m-e-leypold.cl-test/test-procedures
-  
+
     "This package defines the `TEST' abstraction.
 
      TODO: Explain more, refer to other packages. No define-test, though.
@@ -33,7 +33,7 @@
    :register-test
    :test-id
    :get-tests :get-test-ids :do-tests :get-test-list)
-  
+
   (:import-from :de.m-e-leypold.cl-test/test-suites
    :get-or-create-suite :add-test :get-suites :do-suites :do-test-ids))
 
@@ -61,7 +61,7 @@
 
     (let ((test-descriptor (make-instance 'test-descriptor :test-id symbol)))
       (setf (get symbol 'test-descriptor) test-descriptor))
-    
+
     (let ((suite (get-or-create-suite package)))
       (add-test symbol suite))))
 
