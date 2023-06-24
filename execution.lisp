@@ -64,12 +64,38 @@
 
 ;;; * defun MAKE-TEST-PLAN -------------------------------------------------------------------------
 
-(defun make-test-plan ()
-  (let ((tests '()))
+(defun compile-selector (selector)
+  ;; TODO: Actually do some compiling
+  selector)
+  
+(defun compile-selectors (select)
+  (if (eq select :all)
+      (make-array 1 :initial-element #'(lambda (x) t))
+      (progn
+	(let* ((count (length select))
+	       (compiled (make-array count)))
+	  (do ((i 0 (1+ i))
+	       (selector (car select) (car rest))
+	       (rest (cdr select) (cdr rest)))
+	      ((>= i count))
+	    (setf (aref compiled i) (compile-selector selector)))
+	  compiled))))
+
+(defun make-test-plan (&optional select)
+  
+  (let* ((selectors (compile-selectors select))
+	 (count (length selectors))
+	 (tests (make-array count :initial-element '())))
     (do-tests (test)
-      ;; Here we will select tests later
-      (push test tests))
-    (nreverse (mapcar #'test-id tests))))
+      (let ((bucket nil))
+	(do ((i 0 (1+ i)))
+	    ((or (>= i count) bucket))
+	  (if (funcall (aref selectors i) test)
+	      (setf bucket i)))
+	(if bucket
+	    (push (test-id test) (aref tests bucket)))))
+    (let ((tests (apply #'nconc (map 'cons #'(lambda (l) (nreverse l)) tests))))
+      tests)))
 
 ;;; * defun RUN-TESTS -----------------------------------------------------------------------------
 
@@ -103,12 +129,12 @@
      (push (cons test-symbol (cons result-origin more-info)) *errors*))))
 
 
-(defun run-tests (&key restart debug)
+(defun run-tests (&key restart debug (select :all))
 
   (setf *current-test* nil)
 
   (if (not restart)
-      (setf *test-plan* (make-test-plan)))
+      (setf *test-plan* (make-test-plan select)))
 
   (if (not (eq restart :continue))
       (progn (setf *tests-continuation* *test-plan*)

@@ -291,10 +291,12 @@
 	    (push (test-id test) tests))
 	  (assert (equal tests (list s2b s2a s1c s1b s1a))))
 	
-	(assert (equal (make-test-plan)
+	(assert (equal (make-test-plan :all)
 		       (list s1a s1b s1c s2a s2b)))
 
-	
+	(assert (equal (make-test-plan (list #'(lambda (test) (find :smoke (get-tags test)))))
+		       (list s1a)))
+       
 	(let ((results (run-tests)))
 	  (let ((*print-pretty* t))
 	    (format t "results => ~S~%" results)))

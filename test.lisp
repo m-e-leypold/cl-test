@@ -18,8 +18,9 @@
 ;;;
 ;;;  For alternative licensing options, see README.md
 
-(asdf:load-system "de.m-e-leypold.cl-test/tests")
 (asdf:load-system "de.m-e-leypold.cl-test/repl-interface")
+(asdf:load-system "de.m-e-leypold.cl-test/tests")
+
 
 (in-package :de.m-e-leypold.cl-test/loading-ramp)
 (declaim (optimize (speed 0) (space 0) (compilation-speed 0) (debug 3) (safety 3)))
