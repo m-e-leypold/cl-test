@@ -70,7 +70,7 @@
   
 (defun compile-selectors (select)
   (if (eq select :all)
-      (make-array 1 :initial-element #'(lambda (x) t))
+      (make-array 1 :initial-element #'(lambda (x) (declare (ignore x)) t))
       (progn
 	(let* ((count (length select))
 	       (compiled (make-array count)))
