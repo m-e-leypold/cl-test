@@ -29,7 +29,7 @@
      TODO: Explain more, refer to other packages.
     "
   (:export
-   :with-new-suite-registry :do-suites :get-suites
+   :with-new-suite-registry :do-suites :get-suites :get-suite :get-suite-tags
    :get-test-ids :do-test-ids
    :suite-symbol :suite-id
    :devar-suite-symbol))
@@ -160,6 +160,32 @@
       (let ((suite (gethash suite-id *suite-instances*)))
 	(assert (typep suite 'test-suite))
 	suite)))
-      
 
-;; TODO: get-suite (from some signifier)
+(defmethod get-suite ((suite test-suite))
+  suite)
+
+(let ((keyword-package (find-package :keyword)))
+  
+  (defmethod get-suite ((suite-package package))
+    (let* ((package-name (package-name suite-package))
+	   (suite-id (find-symbol package-name keyword-package)))
+      (assert suite-id nil "~S is not a test suite" suite-package)
+      (let ((test-suite (gethash suite-id *suite-instances* nil)))
+	(assert test-suite nil "~S is not a test suite" suite-package)
+	test-suite))))
+
+;;; * Tags: GET-SUITE-TAGS -------------------------------------------------------------------------
+
+(defgeneric get-suite-tags (suite)
+  (:documentation "Get tags of SUITE. Always includes the package name as a keyword symbol"))
+
+(defmethod get-suite-tags ((suite test-suite))
+  (list (suite-id suite)))
+
+(defmethod get-suite-tags ((suite symbol))
+  (get-suite-tags (get-suite suite)))
+
+(defmethod get-suite-tags ((suite package))
+  (get-suite-tags (get-suite suite)))
+
+  

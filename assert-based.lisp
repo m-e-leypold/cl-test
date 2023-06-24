@@ -53,23 +53,25 @@
 		  empty-lambda-list))
 
   (multiple-value-bind (body docstring options)
-      (split-docstring+options+body maybe-docstring+body)
+      (split-docstring+options+body maybe-docstring+body :allowed-tags '(:tags))
 
-    `(progn
-       ,(defvar-suite-symbol name)
-       (export (quote ,name))    ; TODO: Change: Do not export automatically.
+    (let ((tags (get-option :tags options :concatenate t)))
 
-       (defun ,name ()
-	 ,docstring
+      `(progn
+	 ,(defvar-suite-symbol name)
+	 (export (quote ,name))    ; TODO: Change: Do not export automatically.
 
-	 (handler-bind
-	     ((error
-		#'(lambda (e)
-		    (if (not *force-debug*)
-			(error 'failed-assertion :cause e)))))
-	   ,@body))
+	 (defun ,name ()
+	   ,docstring
 
-       (register-test (quote ,name)))))
+	   (handler-bind
+	       ((error
+		  #'(lambda (e)
+		      (if (not *force-debug*)
+			  (error 'failed-assertion :cause e)))))
+	     ,@body))
 
-;;; TODO: Abstract body parsing into parse-function-body and with-parsed-function-body
-;;; TODO: Convert escaping conditions to test failures
+
+	 ;; TODO: Pass tags into register-test
+	 
+	 (register-test (quote ,name) :tags (quote ,tags))))))

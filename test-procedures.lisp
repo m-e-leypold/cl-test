@@ -20,7 +20,7 @@
 (in-package :de.m-e-leypold.cl-test/loading-ramp)
 (declaim (optimize (speed 0) (space 0) (compilation-speed 0) (debug 3) (safety 3)))
 
-;;; * Package definition  --------------------------------------------------------------------------
+;;; * define-package -------------------------------------------------------------------------------
 
 (define-package :de.m-e-leypold.cl-test/test-procedures
 
@@ -32,10 +32,12 @@
   (:export
    :register-test
    :test-id
-   :get-tests :get-test-ids :do-tests :get-test-list)
+   :get-tests :get-test-ids :do-tests :get-test-list
+   :get-tags)
 
   (:import-from :de.m-e-leypold.cl-test/test-suites
-   :get-or-create-suite :add-test :get-suites :do-suites :do-test-ids))
+   :get-or-create-suite :add-test :get-suites :do-suites :do-test-ids :get-suite
+   :get-suite-tags))
 
 (in-package :de.m-e-leypold.cl-test/test-procedures)
 
@@ -46,11 +48,16 @@
     :reader test-id
     :initarg :test-id
     :initform (error "TEST-ID is required for TEST-DESCRIPTOR")
-    :documentation "ID of the test, a symbol")))
+    :documentation "ID of the test, a symbol")
+   (tags
+    :reader tags
+    :initarg :tags
+    :initform nil
+    :documentation "Tags attacvhed to the test, e.g :SMOKE or :EXPENSIVE or :BETA")))
 
-;;; * Test registration ----------------------------------------------------------------------------
+;;; * Test registration: REGISTER-TEST, GET-TEST-DESCRIPTOR ----------------------------------------
 
-(defun register-test (symbol)
+(defun register-test (symbol &key tags)
   "
   Register symbol in `TEST-SUITE', implicitely define SYMBOL-PACKAGE to be a test suite.
 "
@@ -59,7 +66,7 @@
 	    (format t "*** (SYMBOL-PACKAGE '~S) = ~S is not *PACKAGE* = ~S when registering test"
 		    symbol package *package*))
 
-    (let ((test-descriptor (make-instance 'test-descriptor :test-id symbol)))
+    (let ((test-descriptor (make-instance 'test-descriptor :test-id symbol :tags tags)))
       (setf (get symbol 'test-descriptor) test-descriptor))
 
     (let ((suite (get-or-create-suite package)))
@@ -69,7 +76,7 @@
 (defun get-test-descriptor (symbol)
   (get symbol 'test-descriptor))
 
-;;; * Getting at the test list ---------------------------------------------------------------------
+;;; * Getting test, iterating: GET-TESTS, GET-TEST-IDS, DO-TESTS GET-TEST-LIST ---------------------
 
 (defun get-tests ()
   (mapcar #'get-test-descriptor
@@ -79,7 +86,6 @@
 
 
 ;; TODO: Call this get-all-* etc to enable debugging with slime ?!
-
 
 (defun get-test-ids ()
   "Returns a new list of all test ids in the order of the definitions of the respective tests."
@@ -99,4 +105,31 @@
 (defun get-test-list (&optional (sequence-type 'cons))
   (map sequence-type #'get-test-descriptor  (get-test-ids)))
 
-;; TODO: TEST-DESCRIPTOR (mostly as container for flags)
+;;; * Navigating to TEST-SUITE: GET-TEST-SUITE -----------------------------------------------------
+
+(defgeneric get-test-suite (test)
+  (:documentation "Get the `TEST-SUITE' of TEST"))
+
+(defmethod get-test-suite ((test-id symbol))
+  (get-suite (symbol-package test-id)))
+
+(defmethod get-test-suite ((descriptor test-descriptor))
+  (get-test-suite (test-id descriptor)))
+
+
+;;; * Tags and getting tests by tags ---------------------------------------------------------------
+
+(defgeneric get-tags (test)
+  (:documentation "Get tags for TEST"))
+
+(defmethod get-tags ((descriptor test-descriptor))
+  (concatenate 'list
+	       (get-suite-tags (get-test-suite descriptor))
+	       (tags descriptor)))
+
+(defmethod get-tags ((test-id symbol))
+  (let ((descriptor (get-test-descriptor test-id)))
+    (assert descriptor nil "~S does not have a TEST-DESCRIPTOR" test-id)
+    (get-tags descriptor)))
+
+  

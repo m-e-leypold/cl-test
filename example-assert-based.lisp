@@ -44,6 +44,7 @@
 
 (define-test* a-test-that-will-fail ()
   "An assertion based test which will fail"
+  (:tags :smoke :experimental)
   (assert nil))
 
 (define-test* a-test-that-will-pass ()

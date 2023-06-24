@@ -30,7 +30,8 @@
    :with-new-suite-registry
    :get-suites :do-suites :get-suite :do-test-ids :suite-id)
   (:import-from :de.m-e-leypold.cl-test/test-procedures
-   :get-test-ids :get-tests :test-id :do-tests)
+   :get-test-ids :get-tests :test-id :do-tests
+   :get-tags)
   (:import-from :de.m-e-leypold.cl-test/execution
    :make-test-plan :run-tests)
 
@@ -244,6 +245,15 @@
 	  (assert (equal (mapcar #'suite-id suites)
 			 '(:de.m-e-leypold.cl-test/example/assert-based
 			   :de.m-e-leypold.cl-test/example/assert-based-2))))
+
+	;; Have the tags been recorded properly?
+
+	(assert (equal (get-tags s1a)
+		       '(:de.m-e-leypold.cl-test/example/assert-based
+			 :smoke :experimental)))
+
+	(assert (equal (get-tags s2a)
+		       '(:de.m-e-leypold.cl-test/example/assert-based-2)))
 
 	;; Does GET-TEST-IDs return the ids in order of their definition?
 	

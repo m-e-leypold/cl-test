@@ -37,9 +37,11 @@
 ;;; * Handling definition bodies -------------------------------------------------------------------
 
 (defun get-option (tag options &key concatenate)
-  (let ((result (mapcar #'cdr (remove :a options :key #'car :test-not #'eq))))
+  (let ((result (mapcar #'cdr (remove tag options :key #'car :test-not #'eq))))
     (if concatenate
-	(apply #'concatenate 'cons result)
+	(if result
+	    (apply #'concatenate 'cons (remove-if-not #'(lambda (x) x) result))
+	    '())       
 	result)))
 
 (defun split-docstring+options+body (forms &key no-docstring allowed-tags)
