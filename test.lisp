@@ -18,13 +18,17 @@
 ;;;
 ;;;  For alternative licensing options, see README.md
 
-(declaim (optimize (speed 0) (space 0) (compilation-speed 0) (debug 3) (safety 3)))
 (asdf:load-system "de.m-e-leypold.cl-test/tests")
+(asdf:load-system "de.m-e-leypold.cl-test/repl-interface")
+
+(in-package :de.m-e-leypold.cl-test/loading-ramp)
+(declaim (optimize (speed 0) (space 0) (compilation-speed 0) (debug 3) (safety 3)))
 
 ;; For the moment: Run the test(s) explicitely as procedures
 
-(de.m-e-leypold.cl-test/tests:check-split-docstring+options+body)
-(de.m-e-leypold.cl-test/tests:examples-load-properly)
+(de.m-e-leypold.cl-test/repl-interface:set-default-run 'de.m-e-leypold.cl-test/tests:run)
+(de.m-e-leypold.cl-test/tests:run)
+
 
 
 

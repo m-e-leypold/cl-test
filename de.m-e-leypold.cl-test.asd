@@ -42,6 +42,18 @@
 	       "de.m-e-leypold.cl-test/common-layer")
   :components ((:file "assert-based")))
 
+
+(defsystem "de.m-e-leypold.cl-test/repl-interface"
+
+  ;; Documentation see de.m-e-leypold.cl-test/repl-interface:*documentation*
+  
+  :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"
+  :licence "GPL3"
+  :description "CL-TEST interface for the REPL"
+  :depends-on ("de.m-e-leypold.cl-test/loading-ramp"
+	       "de.m-e-leypold.cl-test/common-layer")
+  :components ((:file "repl-interface")))
+
 (defsystem "de.m-e-leypold.cl-test/common-layer"
   :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"
   :licence "GPL3"

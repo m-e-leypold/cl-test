@@ -39,6 +39,7 @@
    :split-docstring+options+body)
   
   (:export
+   :run
    :check-split-docstring+options+body
    :examples-load-properly))
 
@@ -46,6 +47,10 @@
 
 
 ;;; * Tests  ---------------------------------------------------------------------------------------
+
+(defun run ()
+  (de.m-e-leypold.cl-test/tests:check-split-docstring+options+body)
+  (de.m-e-leypold.cl-test/tests:examples-load-properly))
 
 ;;; ** CHECK-SPLIT-DOCSTRING+OPTIONS+BODY  ---------------------------------------------------------
 
