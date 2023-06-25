@@ -31,10 +31,12 @@
 
 (define-test* a-test-that-will-fail ()
   "An assertion based test which will fail"
+  (:tags :experimental)
   (assert nil))
 
 (define-test* a-test-that-will-pass ()
   "An assertion based test which will not fail"
+  (:tags :smoke)
   (assert t))
 
 

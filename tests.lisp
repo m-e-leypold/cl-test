@@ -258,7 +258,11 @@
 			 :smoke :experimental)))
 
 	(assert (equal (get-tags s2a)
-		       '(:de.m-e-leypold.cl-test/example/assert-based-2)))
+		       '(:de.m-e-leypold.cl-test/example/assert-based-2 :experimental)))
+
+	(assert (equal (get-tags s1b)
+		       '(:de.m-e-leypold.cl-test/example/assert-based)))
+
 
 	;; Does GET-TEST-IDs return the ids in order of their definition?
 	
@@ -295,11 +299,32 @@
 		       (list s1a s1b s1c s2a s2b)))
 
 	(assert (equal (make-test-plan (list #'(lambda (test) (find :smoke (get-tags test)))))
-		       (list s1a)))
+		       (list s1a s2b)))
+
+	(assert (equal (make-test-plan '(:smoke))
+		       (list s1a s2b)))
+
+	(assert (equal (make-test-plan '(:experimental))
+		       (list s1a s2a)))
+
+	(assert (equal (make-test-plan '(:smoke :experimental))
+		       (list s1a s2b s2a)))
        
 	(let ((results (run-tests)))
 	  (let ((*print-pretty* t))
 	    (format t "results => ~S~%" results)))
+
+	(let ((results (run-tests :select :smoke)))
+	  (let ((*print-pretty* t))
+	    (format t "results => ~S~%" results)))
+
+	(let ((results (run-tests :select :experimental)))
+	  (let ((*print-pretty* t))
+	    (format t "results => ~S~%" results)))
+
+	(let ((results (run-tests :select '(:smoke :experimental))))
+	  (let ((*print-pretty* t))
+	    (format t "results => ~S~%" results)))	
 	))))
 
 

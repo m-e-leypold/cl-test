@@ -30,7 +30,7 @@
   (:use :de.m-e-leypold.cl-test/conditions)
   (:import-from :de.m-e-leypold.cl-test/test-suites)
   (:import-from :de.m-e-leypold.cl-test/test-procedures
-   :do-tests :test-id :continue))
+   :do-tests :test-id :continue :get-tags))
 
 (in-package :de.m-e-leypold.cl-test/execution)
 
@@ -65,21 +65,31 @@
 ;;; * defun MAKE-TEST-PLAN -------------------------------------------------------------------------
 
 (defun compile-selector (selector)
-  ;; TODO: Actually do some compiling
-  selector)
+  (if (not selector)
+      #'(lambda (test) (declare (ignore test)) nil)
+      (ecase (type-of selector)
+	(compiled-function selector)
+	(keyword #'(lambda (test) (find selector (get-tags test))))
+
+	;; TEST and extend this: AND, OR
+	
+	)))
+
   
 (defun compile-selectors (select)
   (if (eq select :all)
       (make-array 1 :initial-element #'(lambda (x) (declare (ignore x)) t))
       (progn
-	(let* ((count (length select))
-	       (compiled (make-array count)))
-	  (do ((i 0 (1+ i))
-	       (selector (car select) (car rest))
-	       (rest (cdr select) (cdr rest)))
-	      ((>= i count))
-	    (setf (aref compiled i) (compile-selector selector)))
-	  compiled))))
+	(if (not (consp select))
+	    (compile-selectors (list select))	   
+	    (let* ((count (length select))
+		   (compiled (make-array count)))
+	      (do ((i 0 (1+ i))
+		   (selector (car select) (car rest))
+		   (rest (cdr select) (cdr rest)))
+		  ((>= i count))
+		(setf (aref compiled i) (compile-selector selector)))
+	      compiled)))))
 
 (defun make-test-plan (&optional select)
   
