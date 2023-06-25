@@ -103,19 +103,16 @@
 
   
 (defun compile-selectors (select)
-  (if (eq select :all)
-      (make-array 1 :initial-element #'(lambda (x) (declare (ignore x)) t))
-      (progn
-	(if (not (consp select))
-	    (compile-selectors (list select))	   
-	    (let* ((count (length select))
-		   (compiled (make-array count)))
-	      (do ((i 0 (1+ i))
-		   (selector (car select) (car rest))
-		   (rest (cdr select) (cdr rest)))
-		  ((>= i count))
-		(setf (aref compiled i) (compile-selector selector)))
-	      compiled)))))
+  (if (not (consp select))
+      (compile-selectors (list select))	   
+      (let* ((count (length select))
+	     (compiled (make-array count)))
+	(do ((i 0 (1+ i))
+	     (selector (car select) (car rest))
+	     (rest (cdr select) (cdr rest)))
+	    ((>= i count))
+	  (setf (aref compiled i) (compile-selector selector)))
+	compiled)))
 
 (defun make-test-plan (&optional select)
   
@@ -164,7 +161,7 @@
      (push (cons test-symbol (cons result-origin more-info)) *errors*))))
 
 
-(defun run-tests (&key restart debug (select :all))
+(defun run-tests (&key restart debug (select t))
 
   (setf *current-test* nil)
 

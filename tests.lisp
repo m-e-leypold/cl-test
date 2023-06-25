@@ -295,7 +295,7 @@
 	    (push (test-id test) tests))
 	  (assert (equal tests (list s2b s2a s1c s1b s1a))))
 	
-	(assert (equal (make-test-plan :all)
+	(assert (equal (make-test-plan t)
 		       (list s1a s1b s1c s2a s2b)))
 
 	(assert (equal (make-test-plan (list #'(lambda (test) (find :smoke (get-tags test)))))
