@@ -48,11 +48,6 @@
       (de.m-e-leypold.cl-test/repl-interface:force-debugging nil)
       t))
 
-(define-symbol-macro .debug-on
-    (progn
-      (de.m-e-leypold.cl-test/repl-interface:force-debugging t)
-      t))
-
 (defun .debug (&optional (force-p t))
   (de.m-e-leypold.cl-test/repl-interface:force-debugging force-p)
   t)
