@@ -90,6 +90,9 @@
       (if (eq selector t)
 	  #'(lambda (test) (declare (ignore test)) t)
 	  (ecase (type-of selector)
+	    
+	    #+clasp (core:closure selector) ;; seriously?
+
 	    (compiled-function selector)
 	    (keyword #'(lambda (test) (find selector (get-tags test))))
 	    (cons
