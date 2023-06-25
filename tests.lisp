@@ -309,7 +309,22 @@
 
 	(assert (equal (make-test-plan '(:smoke :experimental))
 		       (list s1a s2b s2a)))
-       
+
+	(assert (equal (make-test-plan '((or :smoke :experimental)))
+		       (list s1a s2a s2b)))
+
+	(assert (equal (make-test-plan '((and :smoke :experimental)))
+		       (list s1a)))	
+
+	(assert (equal (make-test-plan '((not :smoke :experimental)))
+		       (list s1b s1c)))
+
+	(assert (equal (make-test-plan '((not :smoke :experimental) t))
+		       (list s1b s1c s1a s2a s2b)))
+
+	
+	;; TODO: Actually check some outcomes of the following runs.
+	
 	(let ((results (run-tests)))
 	  (let ((*print-pretty* t))
 	    (format t "results => ~S~%" results)))

@@ -58,22 +58,48 @@
      ,@body))
 
 
-;;; * User parameters ------------------------------------------------------------------------------
+;;; * User parameters: *FORCE-DEBUG* ---------------------------------------------------------------
 
 (defvar *force-debug* nil)
 
 ;;; * defun MAKE-TEST-PLAN -------------------------------------------------------------------------
 
+(defun compile-selector-or (selectors)
+  (let ((predicates (mapcar #'compile-selector selectors)))
+    #'(lambda (test)
+	(dolist (p predicates)
+	  (if (funcall p test)
+	      (return t))))))
+	
+
+(defun compile-selector-and (selectors)
+    (let ((predicates (mapcar #'compile-selector selectors)))
+    #'(lambda (test)
+	(not (dolist (p predicates)
+	  (if (not (funcall p test))
+	      (return t)))))))
+
+(defun compile-selector-not (selectors)
+  (let ((excluded (compile-selector-or selectors)))
+    #'(lambda (test)
+	(not (funcall excluded test)))))
+
 (defun compile-selector (selector)
   (if (not selector)
       #'(lambda (test) (declare (ignore test)) nil)
-      (ecase (type-of selector)
-	(compiled-function selector)
-	(keyword #'(lambda (test) (find selector (get-tags test))))
-
-	;; TEST and extend this: AND, OR
-	
-	)))
+      (if (eq selector t)
+	  #'(lambda (test) (declare (ignore test)) t)
+	  (ecase (type-of selector)
+	    (compiled-function selector)
+	    (keyword #'(lambda (test) (find selector (get-tags test))))
+	    (cons
+	     (ecase (type-of (car selector))
+	       (keyword (compile-selector-or selector))
+	       (symbol
+		(ecase (car selector)
+		  (or (compile-selector-or (cdr selector)))
+		  (and (compile-selector-and (cdr selector)))
+		  (not (compile-selector-not (cdr selector)))))))))))
 
   
 (defun compile-selectors (select)
@@ -111,12 +137,11 @@
 
 (defun get-results ()
   (list
-   :passed  *passed*
-   :failed  *failed*
-   :errors  *errors*
-   :skipped *skipped*
-   :total   *tests-run*
-   ))
+   :passed  (reverse *passed*)
+   :failed  (reverse *failed*)
+   :errors  (reverse *errors*)
+   :skipped (reverse *skipped*)
+   :total   (reverse *tests-run*)))
 
 
 (defun log-test-result (test-symbol result result-origin &rest more-info)
