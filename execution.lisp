@@ -26,7 +26,7 @@
 
     "TODO: Explain execution."
 
-  (:export :run-tests :make-test-plan :with-new-excution-state)
+  (:export :run-tests :make-test-plan :with-new-excution-state :*current-test* :with-current-test)
   (:use :de.m-e-leypold.cl-test/conditions)
   (:import-from :de.m-e-leypold.cl-test/test-suites)
   (:import-from :de.m-e-leypold.cl-test/test-procedures
@@ -36,15 +36,20 @@
 
 
 ;;; * Execution state  -----------------------------------------------------------------------------
+;;; ** Test results --------------------------------------------------------------------------------
 
-(defvar *test-plan* '())
-(defvar *tests-continuation* '())
 (defvar *tests-run* '())
 (defvar *passed* '())
 (defvar *failed* '())
 (defvar *errors* '())
 (defvar *skipped* '())
-(defvar *current-test* '())
+
+;;; ** Test plan -----------------------------------------------------------------------------------
+
+(defvar *test-plan* '())
+(defvar *tests-continuation* '())
+
+;;; ** WITH-NEW-EXECUTION-STATE --------------------------------------------------------------------
 
 (defmacro with-new-execution-state (&body body)
   `(let ((*test-plan* '())
@@ -57,7 +62,23 @@
 	 (*current-test* '()))
      ,@body))
 
+;;; ** *CURRENT-TEST* and utilities ----------------------------------------------------------------
 
+(defvar *current-test* nil
+  "
+  Contains the current tests test id (the symbol of the test procedure) while the test runs.
+
+  Running tests directly will set the variable, but never unset it, so after the test
+  *CURRENT-TEST* will contain the most recently run test and `RUN-RECENT-TEST' can run the most
+  recently run test.
+
+  After `RUN-TESTS' on the other side the variable will have the value NIL.
+")
+
+(defmacro with-current-test ((symbol) &body body)
+  `(let ((*current-test* ,symbol))
+     ,@body))
+  
 ;;; * User parameters: *FORCE-DEBUG* ---------------------------------------------------------------
 
 (defvar *force-debug* nil)

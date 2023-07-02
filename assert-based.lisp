@@ -29,7 +29,7 @@
   (:import-from :de.m-e-leypold.cl-test/test-procedures
    :register-test)
   (:import-from :de.m-e-leypold.cl-test/execution
-   :*force-debug*)
+   :*force-debug* :*current-test*)
   (:use
    :de.m-e-leypold.cl-test/conditions
    :de.m-e-leypold.cl-test/macro-tools))
@@ -64,6 +64,8 @@
 	 (defun ,name ()
 	   ,docstring
 
+	   (setf *current-test* (quote ,name))
+	   
 	   (handler-bind
 	       ((error
 		  #'(lambda (e)
