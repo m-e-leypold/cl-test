@@ -53,7 +53,8 @@ ifneq ($(strip $(LISP-TEST-RUNNER)),)
 check-with-%::
 	: -- Run tests written in lisp with $* --
 	$(SET-SH)
-	$(LISP-$*-RUN-TEST)
+	mkdir -p .build/log
+	$(LISP-$*-RUN-TEST) 2>&1 | tee .build/log/$@.log
 	:
 
 full-check:: $(ALL-LISP-IMPLEMENTATIONS:%=check-with-%)
