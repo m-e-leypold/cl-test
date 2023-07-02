@@ -64,25 +64,22 @@
 ;;; * Conditions -----------------------------------------------------------------------------------
 
 (define-condition test-condition ()
-  ())
+  ((cause
+    :reader cause
+    :initarg :cause
+    :documentation "Why a test failed, had an error or needs to be skipped")))
 
 (define-condition test-failure (test-condition error)
   ())
 
 (define-condition test-error (test-failure)
-  ((cause
-    :reader cause
-    :initarg :cause
-    :documentation "Why the test has an error")))
+  ())
 
 (define-condition failed-check (test-failure)
   ())
 
 (define-condition skip-request (test-condition)
-  ((cause
-    :reader cause
-    :initarg :cause
-    :documentation "Why the test must be skipped")))
+  ())
 
 (defun skip-test (&optional cause)
   (error 'skip-request :cause cause))

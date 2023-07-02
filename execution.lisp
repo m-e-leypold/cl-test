@@ -111,10 +111,14 @@
       #'(lambda (test) (declare (ignore test)) nil)
       (if (eq selector t)
 	  #'(lambda (test) (declare (ignore test)) t)
+	  
 	  (ecase (type-of selector)
+
+	    ;; TODO switch to typecase to avoid handling differences in type systems?
 	    
 	    #+clasp (core:closure selector) ;; seriously?
 
+	    (function selector)
 	    (compiled-function selector)
 	    (keyword #'(lambda (test) (find selector (get-tags test))))
 	    (cons
