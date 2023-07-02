@@ -26,7 +26,8 @@
 
     "TODO: Explain execution."
 
-  (:export :run-tests :make-test-plan :with-new-excution-state :*current-test* :with-current-test)
+  (:export :run-tests :re-run-test
+   :make-test-plan :with-new-excution-state :*current-test* :with-current-test)
   (:use :de.m-e-leypold.cl-test/conditions)
   (:import-from :de.m-e-leypold.cl-test/test-suites)
   (:import-from :de.m-e-leypold.cl-test/test-procedures
@@ -153,6 +154,16 @@
 	    (push (test-id test) (aref tests bucket)))))
     (let ((tests (apply #'nconc (map 'cons #'(lambda (l) (nreverse l)) tests))))
       tests)))
+
+
+;;; * defun RE-RUN-TEST ---------------------------------------------------------------------------
+
+(defun re-run-test ()
+  (if *current-test*
+      (funcall *current-test*)
+      (if (car *tests-continuation*)
+	  (funcall (car *tests-continuation*))
+	  (error "No current test"))))
 
 ;;; * defun RUN-TESTS -----------------------------------------------------------------------------
 
