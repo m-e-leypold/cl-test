@@ -212,12 +212,25 @@
 (defclass test-run ()
   ((start-time
     :reader start-time
-    :initform (local-time:now))))
+    :initform (local-time:now))
+   (end-time
+    :accessor end-time
+    :initform nil)
+   (run-results
+    :accessor run-results
+    :initform nil)))
+
+;; TODO: Also integrate results!
 
 (defmethod print-object ((run test-run) stream)
   (print-unreadable-object (run stream :type t)
     (format stream "begin=~A" (start-time run))))
-    
+
+(defmethod encode-event-element ((r test-run))
+  `(:test-run :begin ,(start-time r)
+	      :end ,(end-time r)
+	      :results ,(run-results r)))
+
 (defvar *current-test-run* nil)
 
 (defun run-tests (&key restart debug (select t))
@@ -315,13 +328,14 @@
 			  (setf repeat nil)
 			  (register-test-result *current-test* :failed origin (or reason current-condition)))
 			)))
-		  
+	       
 		  (log-test-end *current-test*))
-
+		
 		(pushnew *current-test* *tests-run*)
 		(setf *tests-continuation* (cdr *tests-continuation*))))))
-
-      (log-test-run-end *current-test-run* run-results)
+      (setf (end-time *current-test-run*) (local-time:now))
+      (setf (run-results *current-test-run*) run-results)
+      (log-test-run-end *current-test-run*)
       run-results)))
 
 ;; TODO: Better readable restarts

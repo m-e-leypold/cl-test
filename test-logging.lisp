@@ -35,36 +35,72 @@
    :log-test-end
    :log-test-result
    :*test-console-stream*
-   :*test-event-stream*))
+   :*test-event-stream*
+   :encode-event-element
+   :encode-test-event))
 
 (in-package :de.m-e-leypold.cl-test/test-logging)
 
 ;;; * Streams --------------------------------------------------------------------------------------
 
 (defvar *test-console-stream* *standard-output*)
-(defvar *test-event-stream* nil)
+(defvar *test-event-stream* *standard-output*)
 
 ;; TODO: TEST-OUTPUT-STREAM, TEST-ERROR-STREAM (must be handled by RUN-TEST)
 
 ;;; * General test events --------------------------------------------------------------------------
 
-;;; TODO Marshalling test events
+;;; ** Encoding test events ------------------------------------------------------------------------
 
-(defun log-test-event (event-type &rest rest)
-  (if *test-event-stream*
-      (format *test-event-stream* "~&*** Event: ~S~%" (cons event-type rest))))
+(defgeneric encode-event-element (element)
+  )
+
+(defmethod encode-event-element ((element T))
+  (format nil "~S" element))
+
+
+(defmethod encode-event-element ((elements cons))
+  (mapcar #'encode-event-element elements))
+
+(defmethod encode-event-element ((p package))
+  `(:package ,(package-name p)))
+
+(defmethod encode-event-element ((s symbol))
+  s)
+
+
+(defun encode-test-event (event)
+  (encode-event-element event))
+
+
+;;; ** Handling test events ------------------------------------------------------------------------
+
+;;; TODO:  with-added-test-event-hooks, with-added-test-event-hook, with-test-event-hooks
+
+(defvar *test-event-hooks* nil)
+
+(let ((keyword (find-package "KEYWORD")))
+
+  (defun log-test-event (event-type &rest rest)
+
+    (loop for hook in *test-event-hooks*
+	  do (funcall hook event-type rest))	
+
+    (let ((*package* keyword))
+      (if *test-event-stream*
+	  (format *test-event-stream* "~&*** Event: ~S~%" (encode-test-event (cons event-type rest)))))))
 
 ;;; * Logging run begin/end ------------------------------------------------------------------------
 
 (defun log-test-run-begin (test-run)
   (if *test-console-stream*
       (format *test-console-stream* "~&=> Test run begins ...~%"))
-  (log-test-event :RUN-BEGIN))
+  (log-test-event :RUN-BEGIN test-run))
 
-(defun log-test-run-end (test-run run-results)
+(defun log-test-run-end (test-run)
   (if *test-console-stream*
-      (format *test-console-stream* "~&=> End of test run.~%"))
-  (log-test-event :RUN-END test-run run-results))
+      (format *test-console-stream* "~&=> End of test run.~%")) ; TODO: Also log end-time
+  (log-test-event :RUN-END test-run))
 
 ;;; * Logging suite begin/end ----------------------------------------------------------------------
 
