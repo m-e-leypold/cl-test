@@ -36,26 +36,39 @@
   (apply *default-run* ()))
 
 (defun force-debugging (&optional (force-p t))
-  (setf de.m-e-leypold.cl-test/execution::*force-debug* force-p))
+  (setf de.m-e-leypold.cl-test/execution::*force-debug* force-p)
+  de.m-e-leypold.cl-test/execution::*force-debug*)
 
 (in-package :cl-user)
 
 (define-symbol-macro .debug
     (de.m-e-leypold.cl-test/repl-interface:force-debugging))
 
-(define-symbol-macro .debug-off
+(define-symbol-macro .debug=off
     (progn
-      (de.m-e-leypold.cl-test/repl-interface:force-debugging nil)
-      t))
+      (de.m-e-leypold.cl-test/repl-interface:force-debugging nil)))
 
+(define-symbol-macro .debug=on
+    (.debug))
+
+(define-symbol-macro .d+
+    (.debug))
+
+(define-symbol-macro .d-
+  .debug=off)
+
+(define-symbol-macro .d
+    (de.m-e-leypold.cl-test/repl-interface:force-debugging
+     (not de.m-e-leypold.cl-test/execution::*force-debug*)))
+  
 (defun .debug (&optional (force-p t))
   (de.m-e-leypold.cl-test/repl-interface:force-debugging force-p)
   t)
 
 (define-symbol-macro .t
-  (progn
-    (de.m-e-leypold.cl-test/repl-interface:run)
-    t))
+    (progn
+      (de.m-e-leypold.cl-test/repl-interface:run)
+      t))
 
 (defmacro .t (form)
   `(progn
