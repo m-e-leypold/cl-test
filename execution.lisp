@@ -85,7 +85,7 @@
 (defmacro with-current-test ((symbol) &body body)
   `(let ((*current-test* ,symbol))
      ,@body))
-  
+
 ;;; * User parameters: *FORCE-DEBUG* ---------------------------------------------------------------
 
 (defvar *force-debug* nil)
@@ -98,7 +98,7 @@
 	(dolist (p predicates)
 	  (if (funcall p test)
 	      (return t))))))
-	
+
 
 (defun compile-selector-and (selectors)
     (let ((predicates (mapcar #'compile-selector selectors)))
@@ -117,11 +117,11 @@
       #'(lambda (test) (declare (ignore test)) nil)
       (if (eq selector t)
 	  #'(lambda (test) (declare (ignore test)) t)
-	  
+
 	  (ecase (type-of selector)
 
 	    ;; TODO switch to typecase to avoid handling differences in type systems?
-	    
+
 	    #+clasp (core:closure selector) ;; seriously?
 
 	    (function selector)
@@ -136,10 +136,10 @@
 		  (and (compile-selector-and (cdr selector)))
 		  (not (compile-selector-not (cdr selector)))))))))))
 
-  
+
 (defun compile-selectors (select)
   (if (not (consp select))
-      (compile-selectors (list select))	   
+      (compile-selectors (list select))
       (let* ((count (length select))
 	     (compiled (make-array count)))
 	(do ((i 0 (1+ i))
@@ -150,7 +150,7 @@
 	compiled)))
 
 (defun make-test-plan (&optional select)
-  
+
   (let* ((selectors (compile-selectors select))
 	 (count (length selectors))
 	 (tests (make-array count :initial-element '())))
@@ -216,25 +216,38 @@
    (end-time
     :accessor end-time
     :initform nil)
+   (test-plan
+    :initarg :test-plan
+    :reader test-plan)
+   (continued-p
+    :initarg :continued-p
+    :reader continued-p)
+   (continued-from-plan
+    :initarg :continued-from-plan
+    :reader continued-from-plan)
    (run-results
     :accessor run-results
     :initform nil)))
-
-;; TODO: Also integrate results!
 
 (defmethod print-object ((run test-run) stream)
   (print-unreadable-object (run stream :type t)
     (let* ((results (run-results run))
 	   (passed   (getf results :passed))
 	   (failed   (getf results :failed))
+	   (errors   (getf results :errors))
 	   (skipped  (getf results :skipped)))
 
       (format stream "#passed=~A " (length passed))
       (format stream "#failed=~A " (length failed))
-      (format stream "#skipped=~A " (length skipped))
+      (format stream "#errors=~A " (length errors))
+      (format stream "#skipped=~A " (+ (length skipped)
+				       (if nil
+					   (- (length (continued-from-plan run))
+					      (length (test-plan run)))
+					   0)))
+      (format stream "continued-p=~A " (continued-p run))
       (format stream "begin=~A " (start-time run))
       (format stream "end=~A"   (end-time run)))))
-
 
 (defmethod encode-event-element ((r test-run))
   `(:test-run :begin ,(start-time r)
@@ -252,103 +265,113 @@
   (if (not restart)
       (setf *test-plan* (make-test-plan select)))
 
-  (if (not (eq restart :continue))
-      (progn (setf *tests-continuation* *test-plan*)
-	     (setf *tests-run* '())
-	     (setf *passed* '())
-	     (setf *failed* '())
-  	     (setf *errors* '())))
 
-  ;; TODO: Also capture test plan, restart and continuation
-  
-  (let ((*current-test-run* (make-instance 'test-run))
-	(*current-suite-package* nil) ; Just for isolation
-	(*standard-output* *test-console-stream*)
-	(*error-output* *test-console-stream*)) 
-						   
-    (log-test-run-begin *current-test-run*)
+  (let ((continued-p (eq restart :continue)))
 
-    (let ((run-results 
-	    
-	    (do ()
-		((not *tests-continuation*)
-		 (if *current-suite-package*
-		     (log-suite-exit *current-suite-package*))
-		 (get-results))
-	      
-	      (let* ((*current-test* (car *tests-continuation*))
-		     (current-suite-package  (symbol-package *current-test*))
-		     (*force-debug* (or debug *force-debug*)))
+    (if (not continued-p)
+	(progn (setf *tests-continuation* *test-plan*)
+	       (setf *tests-run* '())
+	       (setf *passed* '())
+	       (setf *failed* '())
+	       (setf *skipped* '())
+  	       (setf *errors* '())))
 
-		(if (not (eq current-suite-package *current-suite-package*))
-		    (progn
-		      (if *current-suite-package*
-			  (log-suite-exit *current-suite-package*))
-		      (setf *current-suite-package* current-suite-package)
-		      (log-suite-enter *current-suite-package*)))
-		
-		(handler-bind
+    ;; TODO: Also capture test plan, restart and continuation
 
-		    ;; TODO: More logging here.
-		    
-		    ((skip-request  #'(lambda (c)
-					(declare (ignore c))
-					(invoke-restart 'skip :run-test)))
 
-		     (failed-check  #'(lambda (c)
+    (let ((*current-test-run*
+	    (make-instance 'test-run
+			   :continued-p continued-p
+			   :test-plan *tests-continuation*
+			   :continued-from-plan (if continued-p *test-plan* nil)
+			   ))
+	  (*current-suite-package* nil) ; Just for isolation
+	  (*standard-output* *test-console-stream*)
+	  (*error-output* *test-console-stream*))
+
+      (log-test-run-begin *current-test-run*)
+
+      (let ((run-results
+
+	      (do ()
+		  ((not *tests-continuation*)
+		   (if *current-suite-package*
+		       (log-suite-exit *current-suite-package*))
+		   (get-results))
+
+		(let* ((*current-test* (car *tests-continuation*))
+		       (current-suite-package  (symbol-package *current-test*))
+		       (*force-debug* (or debug *force-debug*)))
+
+		  (if (not (eq current-suite-package *current-suite-package*))
+		      (progn
+			(if *current-suite-package*
+			    (log-suite-exit *current-suite-package*))
+			(setf *current-suite-package* current-suite-package)
+			(log-suite-enter *current-suite-package*)))
+
+		  (handler-bind
+
+		      ;; TODO: More logging here.
+
+		      ((skip-request  #'(lambda (c)
+					  (declare (ignore c))
+					  (invoke-restart 'skip :run-test)))
+
+		       (failed-check  #'(lambda (c)
+					  (declare (ignore c))
+					  (if (not *force-debug*)
+					      (invoke-restart 'log-failure :run-test))))
+
+		       (test-error  #'(lambda (c)
 					(declare (ignore c))
 					(if (not *force-debug*)
-					    (invoke-restart 'log-failure :run-test))))
+					    (invoke-restart 'log-error :run-test))))
 
-		     (test-error  #'(lambda (c)
-				      (declare (ignore c))
-				      (if (not *force-debug*)
-					  (invoke-restart 'log-error :run-test))))
+		       (error  #'(lambda (c)
+				   (declare (ignore c))
+				   (if (not *force-debug*)
+				       (invoke-restart 'log-error :run-test)))))
 
-		     (error  #'(lambda (c)
-				 (declare (ignore c))
-				 (if (not *force-debug*)
-				     (invoke-restart 'log-error :run-test)))))	 
+		    (log-test-begin *current-test*)
 
-		  (log-test-begin *current-test*)
-		  
-		  (do ((repeat t))
-		      ((not repeat))
-		    (let ((current-condition nil))
-		      (restart-case
-			  (handler-bind
+		    (do ((repeat t))
+			((not repeat))
+		      (let ((current-condition nil))
+			(restart-case
+			    (handler-bind
 
-			      ((condition #'(lambda (c) (setf current-condition c))))
-			    
-			    (funcall *current-test*)
+				((condition #'(lambda (c) (setf current-condition c))))
+
+			      (funcall *current-test*)
+			      (setf repeat nil)
+			      (register-test-result *current-test* :passed :run-test))
+
+			  (repeat () )
+
+			  (skip (&optional (origin :manually) reason)
 			    (setf repeat nil)
-			    (register-test-result *current-test* :passed :run-test))
-			
-			(repeat () )
+			    (register-test-result *current-test* :skipped origin (or reason current-condition)))
 
-			(skip (&optional (origin :manually) reason)
-			  (setf repeat nil)
-			  (register-test-result *current-test* :skipped origin (or reason current-condition)))
+			  (log-error (&optional (origin :manually) reason)
+			    (setf repeat nil)
+			    (register-test-result *current-test* :error origin (or reason current-condition)))
 
-			(log-error (&optional (origin :manually) reason)
-			  (setf repeat nil)
-			  (register-test-result *current-test* :error origin (or reason current-condition)))
+			  ;; Better name for log-failure: Fail-test
 
-			;; Better name for log-failure: Fail-test
+			  (log-failure (&optional (origin :manually) reason)
+			    (setf repeat nil)
+			    (register-test-result *current-test* :failed origin (or reason current-condition)))
+			  )))
 
-			(log-failure (&optional (origin :manually) reason)
-			  (setf repeat nil)
-			  (register-test-result *current-test* :failed origin (or reason current-condition)))
-			)))
-	       
-		  (log-test-end *current-test*))
-		
-		(pushnew *current-test* *tests-run*)
-		(setf *tests-continuation* (cdr *tests-continuation*))))))
-      (setf (end-time *current-test-run*) (local-time:now))
-      (setf (run-results *current-test-run*) run-results)
-      (log-test-run-end *current-test-run*)
-      *current-test-run*)))
+		    (log-test-end *current-test*))
+
+		  (pushnew *current-test* *tests-run*)
+		  (setf *tests-continuation* (cdr *tests-continuation*))))))
+	(setf (end-time *current-test-run*) (local-time:now))
+	(setf (run-results *current-test-run*) run-results)
+	(log-test-run-end *current-test-run*)
+	*current-test-run*))))
 
 ;; TODO: Better readable restarts
 
