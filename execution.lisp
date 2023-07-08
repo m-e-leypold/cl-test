@@ -224,7 +224,17 @@
 
 (defmethod print-object ((run test-run) stream)
   (print-unreadable-object (run stream :type t)
-    (format stream "begin=~A" (start-time run))))
+    (let* ((results (run-results run))
+	   (passed   (getf results :passed))
+	   (failed   (getf results :failed))
+	   (skipped  (getf results :skipped)))
+
+      (format stream "#passed=~A " (length passed))
+      (format stream "#failed=~A " (length failed))
+      (format stream "#skipped=~A " (length skipped))
+      (format stream "begin=~A " (start-time run))
+      (format stream "end=~A"   (end-time run)))))
+
 
 (defmethod encode-event-element ((r test-run))
   `(:test-run :begin ,(start-time r)
@@ -249,6 +259,8 @@
 	     (setf *failed* '())
   	     (setf *errors* '())))
 
+  ;; TODO: Also capture test plan, restart and continuation
+  
   (let ((*current-test-run* (make-instance 'test-run))
 	(*current-suite-package* nil) ; Just for isolation
 	(*standard-output* *test-console-stream*)
@@ -336,7 +348,7 @@
       (setf (end-time *current-test-run*) (local-time:now))
       (setf (run-results *current-test-run*) run-results)
       (log-test-run-end *current-test-run*)
-      run-results)))
+      *current-test-run*)))
 
 ;; TODO: Better readable restarts
 
