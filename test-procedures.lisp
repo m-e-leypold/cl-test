@@ -132,4 +132,3 @@
     (assert descriptor nil "~S does not have a TEST-DESCRIPTOR" test-id)
     (get-tags descriptor)))
 
-  

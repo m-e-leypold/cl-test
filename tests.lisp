@@ -37,7 +37,7 @@
 
   (:import-from :de.m-e-leypold.cl-test/macro-tools
    :split-docstring+options+body)
-  
+
   (:export
    :run
    :check-split-docstring+options+body
@@ -57,7 +57,9 @@
 (define-test* check-split-docstring+options+body ()
 
   "This test checks if various permutations of calling `SPLIT-DOCSTRING+OPTIONS+BODY' actually work."
-  
+
+  (:tags :smoke :utils)
+
   (multiple-value-bind (body docstring options)
       (split-docstring+options+body
        '("a docstring"
@@ -111,7 +113,7 @@
 
     (assert (equal docstring nil)))
 
-  
+
   (multiple-value-bind (body docstring options)
       (split-docstring+options+body
        '((and a body form)
@@ -131,11 +133,11 @@
 	 (and a body form)
 	 (and another form))
        :allowed-tags '(:opt1 :opt2))
-    
+
     (assert (equal body
 		   '((and a body form)
 		     (and another form))))
-      
+
     (assert (equal options nil))
     (assert (equal docstring "a docstring")))
 
@@ -143,7 +145,7 @@
       (split-docstring+options+body
        '("a docstring")
        :allowed-tags '(:opt1 :opt2))
-    
+
     (assert (equal body '(progn )))
     (assert (equal options nil))
     (assert (equal docstring "a docstring")))
@@ -152,7 +154,7 @@
       (split-docstring+options+body
        '()
        :allowed-tags '(:opt1 :opt2))
-    
+
     (assert (equal body '(progn )))
     (assert (equal options nil))
     (assert (equal docstring nil))))
@@ -160,9 +162,12 @@
 ;;; ** EXAMPLES-LOAD-PROPERLY  ---------------------------------------------------------------------
 
 (define-test* examples-load-properly ()
+
+  (:tags :smoke)
+
   "
   Try to load the examples. If this fails, we have a problem with the syntax macros.
-"   
+"
   ;; Effects of loading :DE.M-E-LEYPOLD.CL-TEST/TESTS which already occured.
   ;;
   ;; We phrase this "openly", leaving the possibility that other test suites where also already
@@ -209,7 +214,7 @@
 
 
     ;; Then we force-load the example suites via ASDF.
-    
+
     (asdf:operate 'asdf:load-op "de.m-e-leypold.cl-test/examples" :force T)
 
     (let ((p1 (find-package :de.m-e-leypold.cl-test/example/assert-based))
@@ -217,7 +222,7 @@
 
       ;; The example suites (which are packages) could have been loaded before, but now they
       ;; MUST have been loaded.
-      
+
       (assert p1)  ;; packages are now loaded
       (assert p2)
 
@@ -239,13 +244,13 @@
 	(assert s2b)
 
 	;; Suites registered properly?
-	
+
 	(assert (equal de.m-e-leypold.cl-test/test-suites::*suites*
 		       '(:de.m-e-leypold.cl-test/example/assert-based-2
 			 :de.m-e-leypold.cl-test/example/assert-based)))
 
 	;; Suites have the proper IDs?
-	
+
 	(let ((suites (get-suites)))
 	  (assert (equal (mapcar #'suite-id suites)
 			 '(:de.m-e-leypold.cl-test/example/assert-based
@@ -265,11 +270,11 @@
 
 
 	;; Does GET-TEST-IDs return the ids in order of their definition?
-	
+
 	(assert (equal (get-test-ids) (list s1a s1b s1c s2a s2b)))
 
 	;; Does GET-TESTS return the proper test descriptors (in order of their definition)?
-	
+
 	(let ((tests (get-tests)))
 	  (assert (equal (mapcar #'test-id tests)
 			 (list s1a s1b s1c s2a s2b))))
@@ -279,7 +284,7 @@
 	    (do-test-ids (test-id suite)
 	      (push test-id tests))
 	    (assert (equal tests (list s1c s1b s1a)))))
-	
+
 	(let ((suites '()))
 	  (do-suites (suite)
 	    (push suite suites))
@@ -294,7 +299,7 @@
 	    (assert (typep test 'de.m-e-leypold.cl-test/test-procedures::test-descriptor))
 	    (push (test-id test) tests))
 	  (assert (equal tests (list s2b s2a s1c s1b s1a))))
-	
+
 	(assert (equal (make-test-plan t)
 		       (list s1a s1b s1c s2a s2b)))
 
@@ -314,7 +319,7 @@
 		       (list s1a s2a s2b)))
 
 	(assert (equal (make-test-plan '((and :smoke :experimental)))
-		       (list s1a)))	
+		       (list s1a)))
 
 	(assert (equal (make-test-plan '((not :smoke :experimental)))
 		       (list s1b s1c)))
@@ -322,9 +327,9 @@
 	(assert (equal (make-test-plan '((not :smoke :experimental) t))
 		       (list s1b s1c s1a s2a s2b)))
 
-	
+
 	;; TODO: Actually check some outcomes of the following runs.
-	
+
 	(let ((results (run-tests)))
 	  (let ((*print-pretty* t))
 	    (format t "results => ~S~%" results)))
@@ -339,7 +344,21 @@
 
 	(let ((results (run-tests :select '(:smoke :experimental))))
 	  (let ((*print-pretty* t))
-	    (format t "results => ~S~%" results)))	
+	    (format t "results => ~S~%" results)))
 	))))
 
 
+
+
+
+;;; ** Bogus tests ---------------------------------------------------------------------------------
+
+(define-test* bogus-one ()
+  "A bogus test for test driving the framework"
+  (:tags :bogus)
+  (sleep 2.0))
+
+(define-test* bogus-two ()
+  "A bogus test for test driving the framework"
+  (:tags :bogus)
+  (sleep 1.0))

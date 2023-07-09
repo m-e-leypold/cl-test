@@ -28,22 +28,69 @@
 
   (:export
    :get-test-tags
-   :run-tests))
+   :run)
+
+  (:import-from :de.m-e-leypold.cl-test/test-procedures
+   :get-tags :do-tests)
+
+  (:import-from :de.m-e-leypold.cl-test/execution
+   :run-tests :with-new-excution-state)
+
+  (:import-from :de.m-e-leypold.cl-test/test-logging
+   :*test-console-stream*))
 
 (in-package :de.m-e-leypold.cl-test/emacs-api)
 
-(defun get-test-tags (suites)
-  '(:foo :bar :baz))
-
+(defun get-test-tags (&optional suites)
+  (let ((tags '()))
+    (do-tests (test)
+      (do*
+       ((test-tags (get-tags test) (cdr test-tags))
+	(tag (car test-tags) (car test-tags)))
+       ((not test-tags) tags)
+	(pushnew tag tags)))
+    tags))
+	 
 (defvar *status-output* nil)
+(defvar *log-output* nil)
 
-(defun run-tests (&key status-output select-tags)
+;; TODO: Install event handler, build display from test plan, update dependent on test results.
+
+(defun run (&key status-output select-tags log-output)
   (let ((*status-output*
 	  (open status-output :direction :output :if-does-not-exist :error)))
-    (format *status-output* "~&status-output => ~S~%select-tags => ~S~%"
-	    status-output select-tags)
-    (finish-output *status-output*)))
+    (let ((*log-output*
+	    (open log-output :direction :output :if-does-not-exist :error)))
+
+      (dolist (output (list *status-output* *log-output*))
+	(format output "~%")
+	(format output "Selected: ~S~%" select-tags)
+	(format output "Start:    ~A~%" (local-time:now))
+	(format output "End:      ~A~%" "--")
+	(format output "~%")      
+	(finish-output output))
+
+      (let ((*standard-output* *log-output*)
+	    (*error-output* *log-output*)
+	    (*test-console-stream* *log-output*))
+	
+	(format t "running tests now ...")
+	(finish-output)
+	(run-tests :select select-tags)
+	
+	;; TODO: Output approximate end time, requires "move-to-line"
+	
+	(close *standard-output*)
+	(close *error-output*)))))
     
+;; Note: Alternative output method for log: swank-buffer-streams, see cl-test-el demo.
+
+#+nil (defun test-run (test-sets)
+	(let ((*log-output* (swank-buffer-streams:make-buffer-output-stream :test-log)))
+	  (format *log-output* "Tests sets ~A~%" test-sets)
+	  (finish-output *log-output*)
+	  (close *log-output*)))
+
 
 
   

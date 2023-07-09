@@ -258,9 +258,9 @@
 
 (defun run-tests (&key restart debug (select t))
 
-  (setf *current-test* nil)
-  (setf *current-suite-package* nil) ; Just in case
-  (setf *current-test-run* nil)      ; Just in case
+  (setf *current-test* nil) ; must be a let
+  (Setf *current-suite-package* nil) ; Just in case => must be a LET
+  ;; (setf *current-test-run* nil)      ; Just in case => must be a LET for recursion
 
   (if (not restart)
       (setf *test-plan* (make-test-plan select)))
@@ -288,7 +288,7 @@
 	  (*current-suite-package* nil) ; Just for isolation
 	  (*standard-output* *test-console-stream*)
 	  (*error-output* *test-console-stream*))
-
+      
       (log-test-run-begin *current-test-run*)
 
       (let ((run-results
@@ -368,6 +368,8 @@
 
 		  (pushnew *current-test* *tests-run*)
 		  (setf *tests-continuation* (cdr *tests-continuation*))))))
+	
+
 	(setf (end-time *current-test-run*) (local-time:now))
 	(setf (run-results *current-test-run*) run-results)
 	(log-test-run-end *current-test-run*)
