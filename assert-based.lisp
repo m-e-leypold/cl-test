@@ -59,7 +59,6 @@
 
       `(progn
 	 ,(defvar-suite-symbol name)
-	 (export (quote ,name))    ; TODO: Change: Do not export automatically.
 
 	 (defun ,name ()
 	   ,docstring
@@ -73,7 +72,4 @@
 			  (error 'failed-assertion :cause e)))))
 	     ,@body))
 
-
-	 ;; TODO: Pass tags into register-test
-	 
 	 (register-test (quote ,name) :tags (quote ,tags))))))

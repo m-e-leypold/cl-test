@@ -37,7 +37,9 @@
    :*test-console-stream*
    :*test-event-stream*
    :encode-event-element
-   :encode-test-event))
+   :encode-test-event
+   :with-test-event-hooks
+   :with-added-test-event-hook))
 
 (in-package :de.m-e-leypold.cl-test/test-logging)
 
@@ -68,7 +70,6 @@
 (defmethod encode-event-element ((s symbol))
   s)
 
-
 (defun encode-test-event (event)
   (encode-event-element event))
 
@@ -78,6 +79,14 @@
 ;;; TODO:  with-added-test-event-hooks, with-added-test-event-hook, with-test-event-hooks
 
 (defvar *test-event-hooks* nil)
+
+(defmacro with-test-event-hooks ((&rest hooks) &body body)
+  `(let ((*test-event-hooks* (list ,@hooks)))
+     ,@body))
+
+(defmacro with-added-test-event-hook ((hook) &body body)
+  `(let ((*test-event-hooks* (cons ,hook *test-event-hooks*)))
+     ,@body))
 
 (let ((keyword (find-package "KEYWORD")))
 
