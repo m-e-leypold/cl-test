@@ -32,14 +32,18 @@ include $(BEN)/common/project.mk
 
 ALL-LISP-IMPLEMENTATIONS ?= sbcl ecl clasp ccl cmucl clisp abcl mkcl
 
-LISP-IMPLEMENTATION ?= $(firstword $(ALL-LISP-IMPLEMENTATIONS))
+SUPPORTED-LISP-IMPLEMENTATIONS ?= \
+	$(filter-out $(UNSUPPORTED-LISP-IMPLEMENTATIONS), \
+                     $(ALL-LISP-IMPLEMENTATIONS))
+
+LISP-IMPLEMENTATION ?= $(firstword $(SUPPORTED-LISP-IMPLEMENTATIONS))
 LISP-IMPLEMENTATION := $(strip $(LISP-IMPLEMENTATION))
 
 $(info )
 $(info SYSTEM-NAME             = $(SYSTEM-NAME))
 $(info ASD-FILE                = $(ASD-FILE))
 $(info LISP-IMPLEMENTATION     = $(LISP-IMPLEMENTATION))
-$(info ALL-LISP-IMPLEMENTATION = $(ALL-LISP-IMPLEMENTATIONS))
+$(info ALL-LISP-IMPLEMENTATION = $(SUPPORTED-LISP-IMPLEMENTATIONS))
 
 
 # * Testing --------------------------------------------------------------------
@@ -57,7 +61,7 @@ check-with-%::
 	$(LISP-$*-RUN-TEST) 2>&1 | tee .build/log/$@.log
 	:
 
-full-check:: $(ALL-LISP-IMPLEMENTATIONS:%=check-with-%)
+full-check:: $(SUPPORTED-LISP-IMPLEMENTATIONS:%=check-with-%)
 quick-check:: check-with-$(LISP-IMPLEMENTATION)
 check:: check-with-$(LISP-IMPLEMENTATION)
 
