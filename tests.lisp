@@ -34,7 +34,8 @@
    :get-tags)
   (:import-from :de.m-e-leypold.cl-test/execution
    :make-test-plan :run-tests)
-
+  (:import-from :de.m-e-leypold.cl-test/conditions
+   :skip-test)
   (:import-from :de.m-e-leypold.cl-test/macro-tools
    :split-docstring+options+body)
 
@@ -359,6 +360,32 @@
   (sleep 2.0))
 
 (define-test* bogus-two ()
+  "A bogus test for test driving the framework"
+  (:tags :bogus)
+  (sleep 1.0)
+  (skip-test "demonstrate skipping"))
+
+
+(define-test* bogus-three ()
+  "A bogus test for test driving the framework"
+  (:tags :bogus)
+  (sleep 2.0)
+  (assert (= 1 2)))
+
+
+(define-test* bogus-four ()
+  "A bogus test for test driving the framework"
+  (:tags :bogus)
+  (sleep 1.0)
+  (assert (= 1 2)))
+
+
+(define-test* bogus-five ()
+  "A bogus test for test driving the framework"
+  (:tags :bogus)
+  (sleep 2.0))
+
+(define-test* bogus-six ()
   "A bogus test for test driving the framework"
   (:tags :bogus)
   (sleep 1.0))

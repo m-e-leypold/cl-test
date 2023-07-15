@@ -68,6 +68,16 @@
 	       (:file "test-procedures")
 	       (:file "execution")))
 
+(defsystem "de.m-e-leypold.cl-test/emacs-api"
+  :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"
+  :licence "GPL3"
+  :description "CL-TEST interface to CL-TEST-EL"
+  :depends-on ("de.m-e-leypold.cl-test/loading-ramp"
+	       "de.m-e-leypold.cl-test/common-layer"
+	       "local-time" "cl-interpol")
+  :components ((:file "emacs-api")))
+  
+ 
 (defsystem "de.m-e-leypold.cl-test/loading-ramp"
   :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"
   :licence "GPL3"

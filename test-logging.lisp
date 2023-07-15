@@ -51,7 +51,6 @@
 ;; TODO: TEST-OUTPUT-STREAM, TEST-ERROR-STREAM (must be handled by RUN-TEST)
 
 ;;; * General test events --------------------------------------------------------------------------
-
 ;;; ** Encoding test events ------------------------------------------------------------------------
 
 (defgeneric encode-event-element (element)

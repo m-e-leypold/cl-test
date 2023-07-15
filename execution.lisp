@@ -30,7 +30,8 @@
    :run-tests :re-run-test
    :make-test-plan
    :with-new-excution-state :with-current-test
-   :current-test :current-suite-package :current-suite :current-test-run)
+   :current-test :current-suite-package :current-suite :current-test-run
+   :run-results)
 
   (:use :de.m-e-leypold.cl-test/conditions)
 
@@ -70,14 +71,14 @@
 	 (*current-test* '())
 	 (*current-test-run* '())
 	 (*force-debug* *force-debug*))
-     (with-test-event-hooks ()       
-       ,@body)))
+     ,@body))
 
 
 (defmacro with-new-execution-state (&body body)
   `(let ((*tests-continuation* '())
 	 (*test-plan* '()))
-     ,@body))
+     (with-test-event-hooks ()       
+       ,@body)))
 
 ;;; ** *CURRENT-TEST*, *CURRENT-TEST-RUN* -----------------------------------
 
