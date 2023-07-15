@@ -18,4 +18,6 @@
 #   For altermative licensing options, see README.md
 #
 
+UNSUPPORTED-LISP-IMPLEMENTATIONS := mkcl
+
 include .ben/Lisp.mk
