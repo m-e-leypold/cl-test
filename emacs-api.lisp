@@ -218,11 +218,11 @@
     
 ;; Note: Alternative output method for log: swank-buffer-streams, see cl-test-el demo.
 
-#+nil (defun test-run (test-sets)
-	(let ((*log-output* (swank-buffer-streams:make-buffer-output-stream :test-log)))
-	  (format *log-output* "Tests sets ~A~%" test-sets)
-	  (finish-output *log-output*)
-	  (close *log-output*)))
+;;; (defun test-run (test-sets)
+;;;   (let ((*log-output* (swank-buffer-streams:make-buffer-output-stream :test-log)))
+;;;     (format *log-output* "Tests sets ~A~%" test-sets)
+;;;     (finish-output *log-output*)
+;;;     (close *log-output*)))
 
 
 
