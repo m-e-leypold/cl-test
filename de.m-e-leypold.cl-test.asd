@@ -74,7 +74,7 @@
   :description "CL-TEST interface to CL-TEST-EL"
   :depends-on ("de.m-e-leypold.cl-test/loading-ramp"
 	       "de.m-e-leypold.cl-test/common-layer"
-	       "local-time" "cl-interpol")
+	       "local-time")
   :components ((:file "emacs-api")))
   
  
@@ -122,4 +122,4 @@
   :author "M E Leypold [elegant-weapons (AT) m-e-leypold (DOT) de]"
   :licence "GPL3"
   :description "Load all prerequisites for CL-TEST, see doc/ProjectStructure.org"
-  :depends-on ("local-time" "cl-interpol"))
+  :depends-on ("local-time"))

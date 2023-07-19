@@ -40,7 +40,6 @@
    :*test-console-stream* :with-added-test-event-hook))
 
 (in-package :de.m-e-leypold.cl-test/emacs-api)
-(named-readtables:in-readtable :interpol-syntax)
 
 ;;; * Output streams -------------------------------------------------------------------------------
 
@@ -55,7 +54,13 @@
 
 ;;; ** Output primitives ---------------------------------------------------------------------------
 
-(defun  cmd-cursor-position (line &optional (charpos 0)) (format nil #?"\e[~a;~aH" line charpos))
+(defmacro escape (string-form)
+  (if (typep string-form 'string)
+      (format nil "~A[~A" (code-char 27) string-form)
+      `(format nil "~A[~A" (code-char 27) ,string-form)))
+
+(defun  cmd-cursor-position (line &optional (charpos 0))
+  (format nil (escape "~a;~aH") line charpos))
 
 (defun move-to (line charpos)
   (write-string (cmd-cursor-position line charpos) *status-output*))
