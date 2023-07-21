@@ -27,7 +27,7 @@
     "TODO: Explain execution."
 
   (:export
-   :run-tests :re-run-test
+   :run-tests :re-run-test :run-tests*
    :make-test-plan
    :with-new-excution-state :with-current-test
    :current-test :current-suite-package :current-suite :current-test-run
@@ -62,7 +62,7 @@
 ;;; ** WITH-NEW-EXECUTION-STATE --------------------------------------------------------------------
 
 (defmacro with-new-execution-state* (&body body)  
-  `(let ((*test-plan* '())
+  `(let ((*test-plan* '()) ;; TODO: Move to unstarred
 	 (*tests-run* '())
 	 (*passed* '())
 	 (*failed* '())
@@ -77,7 +77,7 @@
 (defmacro with-new-execution-state (&body body)
   `(let ((*tests-continuation* '())
 	 (*test-plan* '()))
-     (with-test-event-hooks ()       
+     (with-test-event-hooks () ;; perhaps better remove this, instead build on a nesting variable.
        ,@body)))
 
 ;;; ** *CURRENT-TEST*, *CURRENT-TEST-RUN* -----------------------------------
@@ -383,6 +383,17 @@
 	  (setf (run-results *current-test-run*) run-results)
 	  (log-test-run-end *current-test-run*)
 	  *current-test-run*)))))
+
+(defun run-tests* (&key debug (select t))
+
+  ;; Note: diffcult to restart nested test runs.
+
+  ;; Note: also difficult to handle logging this fashion: Some hooks must be removed, others
+  ;; must stay (for logging)
+  
+  (with-new-execution-state
+    (run-tests :debug debug :select select)))
+
 
 ;; TODO: Better readable restarts
 

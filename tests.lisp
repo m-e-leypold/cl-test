@@ -33,7 +33,7 @@
    :get-test-ids :get-tests :test-id :do-tests
    :get-tags)
   (:import-from :de.m-e-leypold.cl-test/execution
-   :make-test-plan :run-tests)
+   :make-test-plan :run-tests :run-tests*)
   (:import-from :de.m-e-leypold.cl-test/conditions
    :skip-test)
   (:import-from :de.m-e-leypold.cl-test/macro-tools
@@ -331,19 +331,19 @@
 
 	;; TODO: Actually check some outcomes of the following runs.
 
-	(let ((results (run-tests)))
+	(let ((results (run-tests*)))
 	  (let ((*print-pretty* t))
 	    (format t "results => ~S~%" results)))
 
-	(let ((results (run-tests :select :smoke)))
+	(let ((results (run-tests* :select :smoke)))
 	  (let ((*print-pretty* t))
 	    (format t "results => ~S~%" results)))
 
-	(let ((results (run-tests :select :experimental)))
+	(let ((results (run-tests* :select :experimental)))
 	  (let ((*print-pretty* t))
 	    (format t "results => ~S~%" results)))
 
-	(let ((results (run-tests :select '(:smoke :experimental))))
+	(let ((results (run-tests* :select '(:smoke :experimental))))
 	  (let ((*print-pretty* t))
 	    (format t "results => ~S~%" results)))
 	))))
