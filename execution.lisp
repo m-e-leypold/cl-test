@@ -27,7 +27,8 @@
     "TODO: Explain execution."
 
   (:export
-   :run-tests :re-run-test :run-tests*
+   :run-tests :re-run-test :run-tests* 
+   :nested-run-p
    :make-test-plan
    :with-new-excution-state :with-current-test
    :current-test :current-suite-package :current-suite :current-test-run
@@ -58,7 +59,6 @@
 (defvar *test-plan* '())
 (defvar *tests-continuation* '())
 
-
 ;;; ** WITH-NEW-EXECUTION-STATE --------------------------------------------------------------------
 
 (defmacro with-new-execution-state* (&body body)  
@@ -77,10 +77,9 @@
 (defmacro with-new-execution-state (&body body)
   `(let ((*tests-continuation* '())
 	 (*test-plan* '()))
-     (with-test-event-hooks () ;; perhaps better remove this, instead build on a nesting variable.
-       ,@body)))
+     ,@body))
 
-;;; ** *CURRENT-TEST*, *CURRENT-TEST-RUN* -----------------------------------
+;;; ** *CURRENT-TEST*, *CURRENT-TEST-RUN*, *NESTED-RUNS* ------------------------------------------
 
 (defvar *current-test* nil
   "
@@ -104,6 +103,12 @@
 (defun current-suite () (get-test-suite *current-test*))
 (defun current-test-run () *current-test-run*)
 
+(defvar *nested-runs* '())
+(defun nested-run-p ()
+  (let ((n (length *nested-runs*)))
+    (if (<= n 1)
+	nil
+	n)))
 
 ;;; * User parameters: *FORCE-DEBUG* ---------------------------------------------------------------
 
@@ -288,18 +293,19 @@
 		 (setf *skipped* '())
   		 (setf *errors* '())))
 
-      (let ((*current-test-run*
-	      (make-instance 'test-run
-			     :continued-p continued-p
-			     :test-plan *tests-continuation*
-			     :continued-from-plan (if continued-p *test-plan* nil)
-			     ))
-	    (last-suite-package nil) ; Just for isolation
-	    (*standard-output* *test-console-stream*)
-	    (*error-output* *test-console-stream*))
+      (let* ((*current-test-run*
+	       (make-instance 'test-run
+			      :continued-p continued-p
+			      :test-plan *tests-continuation*
+			      :continued-from-plan (if continued-p *test-plan* nil)
+			      ))
+	     (*nested-runs* (cons *current-test-run* *nested-runs*))
+	     (last-suite-package nil) ; Just for isolation
+	     (*standard-output* *test-console-stream*)
+	     (*error-output* *test-console-stream*))
 	
 	(log-test-run-begin *current-test-run*)
-
+	
 	(let ((run-results
 
 		(do ()
@@ -386,11 +392,11 @@
 
 (defun run-tests* (&key debug (select t))
 
-  ;; Note: diffcult to restart nested test runs.
+  ;; Note: difficult to restart nested test runs.
 
   ;; Note: also difficult to handle logging this fashion: Some hooks must be removed, others
-  ;; must stay (for logging)
-  
+  ;; must stay (for logging) => maybe better build on nested-run-p
+
   (with-new-execution-state
     (run-tests :debug debug :select select)))
 

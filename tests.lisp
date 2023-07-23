@@ -50,8 +50,7 @@
 ;;; * Tests  ---------------------------------------------------------------------------------------
 
 (defun run ()
-  (de.m-e-leypold.cl-test/tests:check-split-docstring+options+body)
-  (de.m-e-leypold.cl-test/tests:examples-load-properly))
+  (run-tests))
 
 ;;; ** CHECK-SPLIT-DOCSTRING+OPTIONS+BODY  ---------------------------------------------------------
 
