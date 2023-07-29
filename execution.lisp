@@ -245,30 +245,39 @@
     :accessor run-results
     :initform nil)))
 
+;; TODO: Also capture the nesting level + output with print and encode
+
 (defmethod print-object ((run test-run) stream)
   (print-unreadable-object (run stream :type t)
     (let* ((results (run-results run))
+	   (end-time (end-time run))
 	   (passed   (getf results :passed))
 	   (failed   (getf results :failed))
 	   (errors   (getf results :errors))
 	   (skipped  (getf results :skipped)))
 
-      (format stream "#passed=~A " (length passed))
-      (format stream "#failed=~A " (length failed))
-      (format stream "#errors=~A " (length errors))
-      (format stream "#skipped=~A " (+ (length skipped)
-				       (if nil
-					   (- (length (continued-from-plan run))
-					      (length (test-plan run)))
-					   0)))
+      (if end-time
+	  (progn
+	    (format stream "#passed=~A " (length passed))
+	    (format stream "#failed=~A " (length failed))
+	    (format stream "#errors=~A " (length errors))
+	    (format stream "#skipped=~A " (+ (length skipped)
+					     (if nil
+						 (- (length (continued-from-plan run))
+						    (length (test-plan run)))
+						 0)))))
       (format stream "continued-p=~A " (continued-p run))
       (format stream "begin=~A " (start-time run))
-      (format stream "end=~A"   (end-time run)))))
+      (if end-time
+	  (format stream "end=~A"   (end-time run))))))
 
 (defmethod encode-event-element ((r test-run))
-  `(:test-run :begin ,(start-time r)
-	      :end ,(end-time r)
-	      :results ,(run-results r)))
+  (let ((end-time (end-time r)))
+    (if end-time
+	`(:test-run :begin ,(start-time r)
+		    :end ,(end-time r)
+		    :results ,(run-results r))
+	`(:test-run :begin ,(start-time r)))))
 
 
 (defun run-tests (&key restart debug (select t))
