@@ -132,51 +132,60 @@
 
 ;;; * Event handling -------------------------------------------------------------------------------
 
-(defun handle-event (event-type event)
-  (if (not (nested-run-p))
-      
+(defun update-display (event-type event)
+  (if (not (nested-run-p))      
       (progn
-	(format *log-output* "~& => nested: ~A~%" (nested-run-p))
-	(finish-output *log-output*)
-	;; TODO: Split logging and display update => logging always on!
-
-	
 	(ecase event-type
 	  (:run-begin
-	   (format *log-output* "~&=> ~A ~A~%"
-		   event-type event)
-	   (build-status-display)
-	   (format *log-output* "~&display => ~S~%" *status-display*))
-	  (:suite-enter
-	   (format *log-output* "~&   (in-package ~S)~%" (package-name (car event))))
+	   (build-status-display))
+	  (:suite-enter)
 	  (:test-begin)
 	  ((:passed :failed :error :skipped)
 	   (let ((test (cadr event)))
-	     (format *log-output* "~&=> ~A ~A~%     ~S~%"
-		     event-type (symbol-name test) (cddr event))
 	     (move-to (cdr (assoc test *status-display*)) 0)
 	     (format *status-output* "~A" (status event-type))
 	     (park-cursor)))
 	  (:test-end)
 	  (:suite-exit)
 	  (:run-end      
-	   (format *log-output* "~&=> ~A ~A~%"
-		   event-type event)
 	   (move-to 5 11)
 	   (format *status-output* "~A" (local-time:now))
-	   (move-to 6 11)       
+	   (move-to 6 11)
 	   (let ((results (run-results (car event))))
 	     (labels ((count-results (what) (length (getf results what))))
 	       (format *status-output* "#passed=~A #failed=~A #errors=~A #skipped=~A"
 		       (count-results :passed)
 		       (count-results :failed)
 		       (count-results :error)
-		       (count-results :skipped))
-	       (format *log-output* "~&~%     ~S~%"  results)))
+		       (count-results :skipped))))	   
 	   (park-cursor)))
-	
-	(finish-output *status-output*)
-	(finish-output *log-output*))))
+
+	(finish-output *status-output*))))
+
+(defun log-event (event-type event)
+  (finish-output *log-output*)
+  (ecase event-type
+    (:run-begin
+     (format *log-output* "~&=> ~A ~A~%"
+	     event-type event))
+    (:suite-enter
+     (format *log-output* "~&   (in-package ~S)~%" (package-name (car event))))
+    (:test-begin)
+    ((:passed :failed :error :skipped)
+     (let ((test (cadr event)))
+       (format *log-output* "~&=> ~A ~A~%     ~S~%"
+	       event-type (symbol-name test) (cddr event))))
+    (:test-end)
+    (:suite-exit)
+    (:run-end      
+     (format *log-output* "~&=> ~A ~A~%"
+	     event-type event)
+     
+     (let ((results (run-results (car event))))
+       (labels ((count-results (what) (length (getf results what))))
+	 (format *log-output* "~&~%     ~S~%"  results)))))
+    
+  (finish-output *log-output*))
 
 ;;; * CL-TEST-EL interface -------------------------------------------------------------------------
 
@@ -218,8 +227,9 @@
 	  (let ((*status-display* nil)
 		(*status-display-height* nil))
 
-	    (with-added-test-event-hook ('handle-event)
-	      (run-tests :select select-tags)))
+	    (with-added-test-event-hook ('update-display)
+	      (with-added-test-event-hook ('log-event)
+		(run-tests :select select-tags))))
 	  
 	  ;; TODO: Output approximate end time, requires "move-to-line"
 
